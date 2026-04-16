@@ -1,0 +1,214 @@
+.for-whom {
+  position: relative;
+  padding: var(--space-24) 0;
+  border-top: 1px solid var(--border-subtle);
+  overflow: hidden;
+}
+
+/* Ambient background glow */
+.for-whom::before {
+  content: '';
+  position: absolute;
+  top: -50px;
+  left: 30%;
+  transform: translateX(-50%);
+  width: 800px;
+  height: 600px;
+  background: radial-gradient(ellipse at center,
+  rgba(124, 58, 237, 0.15) 0%,
+  rgba(124, 58, 237, 0.04) 50%,
+  transparent 70%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Subtle grid overlay */
+.for-whom::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--border-subtle) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border-subtle) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 30%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 30%, transparent 80%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.for-whom > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Layout ──────────────────────────────── */
+.for-whom-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-16);
+  align-items: start;
+}
+
+/* ── Left: Text ──────────────────────────── */
+.for-whom-text {
+  position: sticky;
+  top: 100px;
+}
+
+.for-whom-text .section-label {
+  margin-bottom: var(--space-3);
+}
+
+.for-whom-text h2 {
+  margin-bottom: var(--space-5);
+}
+
+.for-whom-text > p {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.75;
+  margin-bottom: var(--space-8);
+}
+
+/* CTA block */
+.for-whom-cta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.for-whom-cta .btn {
+  align-self: flex-start;
+}
+
+.for-whom-cta-note {
+  font-size: 12.5px;
+  font-family: var(--font-mono);
+  color: var(--text-tertiary);
+}
+
+/* ── Right: Cards ────────────────────────── */
+.for-whom-cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* Individual audience card */
+.audience-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  padding: var(--space-5) var(--space-6);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+  cursor: default;
+}
+
+.audience-card:hover {
+  background: var(--bg-elevated);
+  border-color: var(--border-default);
+  transform: translateX(4px);
+}
+
+.audience-card--highlight {
+  border-color: var(--accent-border);
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.08), var(--bg-surface));
+}
+
+.audience-card--highlight:hover {
+  border-color: var(--accent-bright);
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.14), var(--bg-elevated));
+}
+
+/* Icon */
+.audience-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  transition: border-color 0.2s ease;
+}
+
+.audience-card--highlight .audience-icon {
+  background: var(--accent-muted);
+  border-color: var(--accent-border);
+  color: var(--accent-bright);
+}
+
+.audience-card:hover .audience-icon {
+  border-color: var(--border-strong);
+}
+
+/* Text */
+.audience-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.audience-body h4 {
+  font-size: 14.5px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  margin-bottom: 5px;
+}
+
+.audience-body p {
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+/* Not-for badge */
+.for-whom-not {
+  margin-top: var(--space-6);
+  padding: var(--space-4) var(--space-5);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.for-whom-not-icon {
+  color: var(--text-tertiary);
+  font-size: 14px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.for-whom-not p {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  line-height: 1.6;
+}
+
+.for-whom-not p strong {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* ── Responsive ──────────────────────────── */
+@media (max-width: 900px) {
+  .for-whom-inner {
+    grid-template-columns: 1fr;
+    gap: var(--space-10);
+  }
+
+  .for-whom-text {
+    position: static;
+  }
+}
