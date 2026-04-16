@@ -1,0 +1,13 @@
+.btn--primary {
+  background: var(--text-primary);
+  color: var(--text-inverse);
+}
+
+.btn--primary:hover {
+  background: rgba(245, 245, 245, 0.88);
+  transform: translateY(-1px);
+}
+
+.btn--primary:active {
+  transform: translateY(0);
+}

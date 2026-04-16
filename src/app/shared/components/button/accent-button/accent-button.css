@@ -1,0 +1,11 @@
+.btn--accent {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 0 20px rgba(124, 58, 237, 0.3);
+}
+
+.btn--accent:hover {
+  background: var(--accent-bright);
+  box-shadow: 0 0 28px rgba(124, 58, 237, 0.45);
+  transform: translateY(-1px);
+}
