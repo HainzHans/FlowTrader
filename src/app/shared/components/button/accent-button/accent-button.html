@@ -1,4 +1,6 @@
-<button class="btn btn--accent btn--lg">
-  Jetzt starten
+<button class="btn btn--accent btn--lg" style="width: 100%; justify-content: center;">
+  @if (buttonIcon()) {
+    <i class="pi {{buttonIcon()}}"></i>
+  }
+  {{buttonText()}}
 </button>
-

@@ -4,35 +4,19 @@
   border-top: 1px solid var(--border-subtle);
 }
 
-/* Ambient background glow */
+/* Glow that bleeds from hero into features */
 .features::before {
   content: '';
   position: absolute;
-  top: -200px;
+  top: -120px;
   left: 50%;
   transform: translateX(-50%);
-  width: 800px;
-  height: 600px;
+  width: 700px;
+  height: 400px;
   background: radial-gradient(ellipse at center,
-  rgba(124, 58, 237, 0.15) 0%,
-  rgba(124, 58, 237, 0.04) 50%,
+  rgba(124, 58, 237, 0.10) 0%,
   transparent 70%
   );
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* Subtle grid overlay */
-.features::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(var(--border-subtle) 1px, transparent 1px),
-    linear-gradient(90deg, var(--border-subtle) 1px, transparent 1px);
-  background-size: 60px 60px;
-  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 30%, transparent 80%);
-  -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 30%, transparent 80%);
   pointer-events: none;
   z-index: 0;
 }
@@ -191,5 +175,11 @@
 
   .feature-card {
     padding: var(--space-6);
+  }
+}
+
+@media (max-width: 480px) {
+  .features {
+    padding: var(--space-16) 0;
   }
 }

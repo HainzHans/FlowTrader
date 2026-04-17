@@ -4,6 +4,7 @@ import {LandingPageHero} from '../components/landing-page-hero/landing-page-hero
 import {LandingPageHeader} from '../components/landing-page-header/landing-page-header';
 import {LandingPageFeatures} from '../components/landing-page-features/landing-page-features';
 import {LandingPageForWhom} from '../components/landing-page-for-whom/landing-page-for-whom';
+import {LandingPagePricing} from '../components/landing-page-pricing/landing-page-pricing';
 
 @Component({
   selector: 'app-landing-page',
@@ -12,7 +13,8 @@ import {LandingPageForWhom} from '../components/landing-page-for-whom/landing-pa
     LandingPageHero,
     LandingPageFooter,
     LandingPageFeatures,
-    LandingPageForWhom
+    LandingPageForWhom,
+    LandingPagePricing
   ],
   templateUrl: './landing-page.html',
   styleUrl: './landing-page.css',

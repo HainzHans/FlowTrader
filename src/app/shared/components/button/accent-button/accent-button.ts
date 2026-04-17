@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, input, signal} from '@angular/core';
 
 @Component({
   selector: 'app-accent-button',
@@ -6,4 +6,9 @@ import { Component } from '@angular/core';
   templateUrl: './accent-button.html',
   styleUrl: './accent-button.css',
 })
-export class AccentButton {}
+export class AccentButton {
+
+  buttonText = input<string>('');
+  buttonIcon = input<string>('');
+
+}

@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap');
-
+@import "primeicons/primeicons.css";
+@import "app/assets/styles/dashboard-styles.css";
 /* ─────────────────────────────────────────────
    Design Tokens
 ───────────────────────────────────────────── */
@@ -87,6 +88,31 @@ body {
 }
 
 /* ─────────────────────────────────────────────
+   Shared Section Background System
+   All sections share one continuous bg layer
+───────────────────────────────────────────── */
+
+/* The global ambient grid — rendered once on body */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--border-subtle) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border-subtle) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.5;
+}
+
+/* Each section sits above the grid */
+section, footer, header {
+  position: relative;
+  z-index: 1;
+}
+
+/* ─────────────────────────────────────────────
    Layout
 ───────────────────────────────────────────── */
 .container {
@@ -166,8 +192,6 @@ code, kbd {
   white-space: nowrap;
   text-decoration: none;
 }
-
-
 
 .btn--sm {
   padding: 7px 14px;

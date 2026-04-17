@@ -1,0 +1,302 @@
+.pricing {
+  position: relative;
+  padding: var(--space-24) 0;
+  border-top: 1px solid var(--border-subtle);
+}
+
+/* Glow from below */
+.pricing::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 20%;
+  transform: translateX(50%);
+  width: 700px;
+  height: 500px;
+  background: radial-gradient(ellipse at center,
+  rgba(124, 58, 237, 0.11) 0%,
+  transparent 70%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+.pricing > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Header ──────────────────────────────── */
+.pricing-header {
+  text-align: center;
+  max-width: 520px;
+  margin: 0 auto var(--space-16);
+}
+
+.pricing-header .section-label {
+  margin-bottom: var(--space-3);
+}
+
+.pricing-header h2 {
+  margin-bottom: var(--space-4);
+}
+
+.pricing-subline {
+  font-size: 1.0625rem;
+  color: var(--text-secondary);
+  line-height: 1.75;
+}
+
+/* ── Grid ────────────────────────────────── */
+.pricing-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-6);
+  max-width: 820px;
+  margin: 0 auto;
+  align-items: start;
+}
+
+/* ── Card base ───────────────────────────── */
+.pricing-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-8);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.pricing-card:hover {
+  border-color: var(--border-default);
+}
+
+/* Pro card */
+.pricing-card--pro {
+  border-color: var(--accent-border);
+  background: linear-gradient(160deg,
+  rgba(124, 58, 237, 0.10) 0%,
+  var(--bg-surface) 50%
+  );
+  box-shadow:
+    0 0 0 1px var(--accent-border),
+    0 32px 64px rgba(124, 58, 237, 0.12),
+    0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.pricing-card--pro:hover {
+  border-color: var(--accent-bright);
+  transform: translateY(-2px);
+}
+
+/* Popular badge */
+.pricing-popular {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--accent);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 5px 14px;
+  border-radius: 99px;
+  white-space: nowrap;
+  box-shadow: 0 4px 16px rgba(124, 58, 237, 0.4);
+}
+
+/* ── Card top ────────────────────────────── */
+.pricing-card-top {
+  margin-bottom: var(--space-6);
+}
+
+.pricing-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-lg);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-4);
+}
+
+.pricing-icon--accent {
+  background: var(--accent-muted);
+  border-color: var(--accent-border);
+  color: var(--accent-bright);
+}
+
+.pricing-plan-name {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.03em;
+  margin-bottom: var(--space-2);
+}
+
+.pricing-plan-desc {
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* ── Price ───────────────────────────────── */
+.pricing-price {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  margin-bottom: var(--space-6);
+}
+
+.pricing-amount {
+  font-size: 3.5rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--text-primary);
+}
+
+.pricing-price-meta {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 6px;
+}
+
+.pricing-currency {
+  font-size: 1.25rem;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+  line-height: 1;
+}
+
+.pricing-period {
+  font-size: 13px;
+  font-family: var(--font-mono);
+  color: var(--text-tertiary);
+  line-height: 1.4;
+}
+
+/* ── Divider ─────────────────────────────── */
+.pricing-divider {
+  height: 1px;
+  background: var(--border-subtle);
+  margin-bottom: var(--space-6);
+}
+
+/* ── Features list ───────────────────────── */
+.pricing-features {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-8);
+  flex: 1;
+}
+
+.pricing-feature {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.pricing-feature--muted {
+  color: var(--text-tertiary);
+}
+
+.pricing-feature-icon {
+  font-size: 13px;
+  color: var(--green);
+  margin-top: 1px;
+  flex-shrink: 0;
+}
+
+.pricing-feature-icon--muted {
+  color: var(--text-tertiary) !important;
+}
+
+.pricing-feature-icon--accent {
+  color: var(--accent-bright) !important;
+}
+
+/* ── CTA ─────────────────────────────────── */
+.pricing-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-3);
+}
+
+.pricing-cta app-secondary-button .btn,
+.pricing-cta app-accent-button .btn {
+  width: 100%;
+  justify-content: center;
+}
+
+/* Force buttons full-width inside cards */
+.pricing-cta ::ng-deep .btn {
+  width: 100%;
+  justify-content: center;
+}
+
+.pricing-cta-note {
+  font-size: 12px;
+  font-family: var(--font-mono);
+  color: var(--text-tertiary);
+  text-align: center;
+}
+
+/* ── Footer note ─────────────────────────── */
+.pricing-footer-note {
+  text-align: center;
+  font-size: 13px;
+  font-family: var(--font-mono);
+  color: var(--text-tertiary);
+  margin-top: var(--space-10);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+/* ── Responsive ──────────────────────────── */
+@media (max-width: 700px) {
+  .pricing-grid {
+    grid-template-columns: 1fr;
+    max-width: 480px;
+  }
+
+  /* Show pro first on mobile */
+  .pricing-card--pro {
+    order: -1;
+  }
+}
+
+@media (max-width: 480px) {
+  .pricing {
+    padding: var(--space-16) 0;
+  }
+
+  .pricing-card {
+    padding: var(--space-6);
+  }
+
+  .pricing-amount {
+    font-size: 2.75rem;
+  }
+}
