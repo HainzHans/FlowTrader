@@ -90,7 +90,16 @@
 
     <!-- Main Content -->
     <main class="main-content">
-      <app-note-section></app-note-section>
+
+      @switch (activeKey()) {
+        @case('notes') {
+          <app-note-section></app-note-section>
+        }@case('rules') {
+          <app-rules-component></app-rules-component>
+        }
+
+      }
+
     </main>
 
   </div>

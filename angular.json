@@ -26,8 +26,7 @@
             ],
             "styles": [
               "node_modules/primeicons/primeicons.css",
-              "src/styles.css",
-              "src/assets/styles/dashboard-styles.css"
+              "src/styles.css"
             ]
           },
           "configurations": {

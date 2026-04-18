@@ -1,0 +1,81 @@
+@if (visible()) {
+  <div class="modal-overlay" (click)="onOverlayClick($event)">
+    <div class="modal" role="dialog" aria-modal="true">
+
+      <div class="modal-header">
+        <div class="modal-title-row">
+          <div class="modal-icon">
+            <i class="pi pi-list"></i>
+          </div>
+          <div>
+            <h3 class="modal-title">{{ isEdit ? 'Regel bearbeiten' : 'Neue Regel' }}</h3>
+            @if (folderName()) {
+              <p class="modal-subtitle">in <span class="modal-subtitle-folder">{{ folderName() }}</span></p>
+            }
+          </div>
+        </div>
+        <button class="modal-close" (click)="cancel()" aria-label="Schließen">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+
+        <div class="form-field">
+          <label class="form-label">Regel <span class="required">*</span></label>
+          <input
+            class="form-input"
+            type="text"
+            placeholder="z.B. Maximal 1% Risiko pro Trade"
+            [value]="title()"
+            (input)="title.set($any($event.target).value)"
+            maxlength="120"
+          />
+        </div>
+
+        <div class="form-field">
+          <label class="form-label">
+            Beschreibung <span class="optional">(optional)</span>
+          </label>
+          <textarea
+            class="form-input form-textarea"
+            placeholder="Erkläre dir selbst, warum diese Regel wichtig ist…"
+            [value]="description()"
+            (input)="description.set($any($event.target).value)"
+            rows="3"
+            maxlength="400"
+          ></textarea>
+        </div>
+
+        <div class="form-field">
+          <label class="form-label">Priorität</label>
+          <div class="priority-selector">
+            @for (p of priorities; track p) {
+              <button
+                class="priority-btn"
+                [class.active]="priority() === p"
+                [style.--p-color]="priorityConfig[p].color"
+                [style.--p-bg]="priorityConfig[p].bg"
+                [style.--p-border]="priorityConfig[p].border"
+                (click)="setPriority(p)"
+                type="button"
+              >
+                <span class="priority-btn-dot"></span>
+                {{ priorityConfig[p].label }}
+              </button>
+            }
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn--secondary btn--sm" (click)="cancel()">Abbrechen</button>
+        <button class="btn btn--primary btn--sm" (click)="save()" [disabled]="!isValid">
+          {{ isEdit ? 'Speichern' : 'Regel erstellen' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+}

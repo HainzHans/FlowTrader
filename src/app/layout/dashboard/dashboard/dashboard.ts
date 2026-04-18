@@ -1,6 +1,6 @@
-import {Component, signal} from '@angular/core';
-import {FolderCard} from '../../../shared/components/cards/folder-card/folder-card';
+import {Component, computed, signal} from '@angular/core';
 import {NoteSection} from '../components/note-section/note-section';
+import {RulesComponent} from '../components/rules-component/rules-component';
 
 export interface NavItem {
   icon:      string;
@@ -12,8 +12,8 @@ export interface NavItem {
 @Component({
   selector: 'app-dashboard',
   imports: [
-    FolderCard,
-    NoteSection
+    NoteSection,
+    RulesComponent,
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
@@ -24,8 +24,8 @@ export class Dashboard {
   activeKey   = signal<string>('admin-overview');
 
   userItems: NavItem[] = [
-    { icon: 'pi-pencil',    label: 'Notizen', key: 'pencil'     },
-    { icon: 'pi-verified', label: 'Regeln',   key: 'verified' },
+    { icon: 'pi-pencil',    label: 'Notizen', key: 'notes'     },
+    { icon: 'pi-verified', label: 'Regeln',   key: 'rules' },
     { icon: 'pi-arrow-right-arrow-left', label: 'Trades',   key: 'arrow-right-arrow-left' },
   ];
 
@@ -40,6 +40,11 @@ export class Dashboard {
     { icon: 'pi-users',    label: 'Übersicht', key: 'admin-overview'     },
     { icon: 'pi-calendar', label: 'Termine',   key: 'admin-appointments' },
   ];
+
+  constructor() {
+
+  }
+
 
   toggle() {
     this.isExpanded.update(v => !v);

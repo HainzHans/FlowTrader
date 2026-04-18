@@ -1,0 +1,167 @@
+:host {
+  display: block;
+}
+
+.rule-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+  cursor: default;
+  position: relative;
+  overflow: visible;
+}
+
+.rule-item:hover {
+  border-color: var(--border-default);
+  background: var(--bg-elevated);
+  transform: translateX(2px);
+}
+
+/* Priority left bar */
+.rule-item-left {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  flex: 1;
+  min-width: 0;
+}
+
+.rule-priority-bar {
+  width: 3px;
+  min-height: 36px;
+  border-radius: 99px;
+  flex-shrink: 0;
+  align-self: stretch;
+  opacity: 0.8;
+}
+
+/* Use CSS custom properties for priority colors */
+:host { --priority-color-critical: #ef4444; }
+:host { --priority-color-high: #f97316; }
+:host { --priority-color-medium: #eab308; }
+:host { --priority-color-low: #22c55e; }
+
+.rule-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.rule-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.rule-title {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+  flex: 1;
+  min-width: 0;
+}
+
+.rule-description {
+  font-size: 12.5px;
+  color: var(--text-tertiary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* Actions / context menu */
+.rule-actions {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.rule-menu-btn {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  color: var(--text-tertiary);
+  cursor: pointer;
+  font-size: 13px;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+  opacity: 0;
+}
+
+.rule-item:hover .rule-menu-btn,
+.rule-menu-btn.active {
+  opacity: 1;
+}
+
+.rule-menu-btn:hover,
+.rule-menu-btn.active {
+  color: var(--text-secondary);
+  background: var(--bg-base);
+  border-color: var(--border-default);
+}
+
+.rule-menu {
+  position: absolute;
+  top: 32px;
+  right: 0;
+  z-index: 100;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: 4px;
+  min-width: 150px;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+  animation: menuIn 0.12s ease;
+}
+
+@keyframes menuIn {
+  from { opacity: 0; transform: translateY(-4px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.rule-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 7px 10px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+  font-family: var(--font-sans);
+  text-align: left;
+}
+
+.rule-menu-item:hover {
+  background: var(--bg-overlay);
+  color: var(--text-primary);
+}
+
+.rule-menu-item--danger {
+  color: #ef4444;
+}
+
+.rule-menu-item--danger:hover {
+  background: rgba(239,68,68,0.1);
+  color: #f87171;
+}
+
+.rule-menu-divider {
+  height: 1px;
+  background: var(--border-subtle);
+  margin: 3px 0;
+}

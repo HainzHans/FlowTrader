@@ -1,0 +1,99 @@
+@if (visible()) {
+  <div class="modal-overlay" (click)="onOverlayClick($event)">
+    <div class="modal" role="dialog" aria-modal="true">
+
+      <div class="modal-header">
+        <div class="modal-title-row">
+          <div class="modal-icon"
+               [style.background]="color() + '22'"
+               [style.border-color]="color() + '55'">
+            <i class="pi {{ icon() }}" [style.color]="color()"></i>
+          </div>
+          <div>
+            <h3 class="modal-title">{{ isEdit ? 'Ordner bearbeiten' : 'Neuer Ordner' }}</h3>
+            <p class="modal-subtitle">Kategorisiere deine Trading-Regeln</p>
+          </div>
+        </div>
+        <button class="modal-close" (click)="cancel()" aria-label="Schließen">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+
+        <div class="form-field">
+          <label class="form-label">Name <span class="required">*</span></label>
+          <input
+            class="form-input"
+            type="text"
+            placeholder="z.B. Risikomanagement"
+            [value]="name()"
+            (input)="name.set($any($event.target).value)"
+            maxlength="60"
+          />
+        </div>
+
+        <div class="form-field">
+          <label class="form-label">
+            Beschreibung <span class="optional">(optional)</span>
+          </label>
+          <input
+            class="form-input"
+            type="text"
+            placeholder="Kurze Erklärung dieses Ordners"
+            [value]="description()"
+            (input)="description.set($any($event.target).value)"
+            maxlength="120"
+          />
+        </div>
+
+        <div class="form-field">
+          <label class="form-label">Farbe</label>
+          <div class="color-grid">
+            @for (c of colors; track c.value) {
+              <button
+                class="color-swatch"
+                [class.active]="color() === c.value"
+                [style.background]="c.value"
+                [attr.title]="c.label"
+                (click)="color.set(c.value)"
+                type="button"
+              >
+                @if (color() === c.value) {
+                  <i class="pi pi-check"></i>
+                }
+              </button>
+            }
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label class="form-label">Icon</label>
+          <div class="icon-grid">
+            @for (ic of icons; track ic) {
+              <button
+                class="icon-btn"
+                [class.active]="icon() === ic"
+                [style.--active-color]="color()"
+                (click)="icon.set(ic)"
+                type="button"
+                [attr.aria-label]="ic"
+              >
+                <i class="pi {{ ic }}"></i>
+              </button>
+            }
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn--secondary btn--sm" (click)="cancel()">Abbrechen</button>
+        <button class="btn btn--primary btn--sm" (click)="save()" [disabled]="!isValid">
+          {{ isEdit ? 'Speichern' : 'Ordner erstellen' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+}

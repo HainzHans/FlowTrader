@@ -6,8 +6,24 @@
         [buttonText]="'Neue Notiz'"
         [buttonIcon]="'pi-pencil'"
       ></app-accent-button>
+      <app-accent-button
+        [buttonText]="'Neuer Ordner'"
+        [buttonIcon]="'pi-plus'"
+      ></app-accent-button>
     </div>
   </div>
 
-  <app-folder-card></app-folder-card>
+  <div class="section-content-grid">
+    @for (folder of noteCategories; track folder.id) {
+      <app-folder-card
+        [folderId]="folder.id.toString()"
+        [folderLabel]="folder.label"
+        [folderPrimaryLabel]="folder.primaryLabel"
+        [folderPrimaryCounter]="folder.primaryCounter"
+        [folderSecondaryLabel]="folder.secondaryLabel"
+        [folderSecondaryCounter]="folder.secondaryCounter"
+        [folderLastUpdated]="folder.lastUpdated"
+      ></app-folder-card>
+    }
+  </div>
 </div>

@@ -1,0 +1,106 @@
+<section class="rules-section">
+
+  <!-- Page Header -->
+  <div class="rules-header">
+    <div class="rules-header-text">
+      <h2 class="rules-title">Meine Regeln</h2>
+      <p class="rules-subtitle">Definiere und halte deine Trading-Regeln fest</p>
+    </div>
+    <button class="btn btn--primary btn--sm rules-new-folder-btn"
+            (click)="openFolderModal()"
+            type="button">
+      <i class="pi pi-plus"></i>
+      <span>Ordner erstellen</span>
+    </button>
+  </div>
+
+  <!-- Stats bar — only shown when rules exist -->
+  @if (totalRules() > 0) {
+    <div class="rules-stats">
+      <div class="rules-stat-card">
+        <span class="rules-stat-value">{{ totalRules() }}</span>
+        <span class="rules-stat-label">Regeln gesamt</span>
+      </div>
+      <div class="rules-stat-card">
+        <span class="rules-stat-value">{{ folders().length }}</span>
+        <span class="rules-stat-label">Kategorien</span>
+      </div>
+      @if (prioritySummary().critical > 0) {
+        <div class="rules-stat-card rules-stat-card--critical">
+          <span class="rules-stat-value">{{ prioritySummary().critical }}</span>
+          <span class="rules-stat-label">Kritisch</span>
+        </div>
+      }
+
+      <!-- Priority distribution bar -->
+      <div class="rules-priority-bar">
+        @if (prioritySummary().critical > 0) {
+          <div class="rules-priority-segment"
+               [style.width.%]="(prioritySummary().critical / totalRules()) * 100"
+               [style.background]="priorityConfig.critical.color"
+               title="Kritisch: {{ prioritySummary().critical }}">
+          </div>
+        }
+        @if (prioritySummary().high > 0) {
+          <div class="rules-priority-segment"
+               [style.width.%]="(prioritySummary().high / totalRules()) * 100"
+               [style.background]="priorityConfig.high.color"
+               title="Hoch: {{ prioritySummary().high }}">
+          </div>
+        }
+        @if (prioritySummary().medium > 0) {
+          <div class="rules-priority-segment"
+               [style.width.%]="(prioritySummary().medium / totalRules()) * 100"
+               [style.background]="priorityConfig.medium.color"
+               title="Mittel: {{ prioritySummary().medium }}">
+          </div>
+        }
+        @if (prioritySummary().low > 0) {
+          <div class="rules-priority-segment"
+               [style.width.%]="(prioritySummary().low / totalRules()) * 100"
+               [style.background]="priorityConfig.low.color"
+               title="Niedrig: {{ prioritySummary().low }}">
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Folders list -->
+  <div class="rules-body">
+    @if (folders().length === 0) {
+      <div class="rules-empty-wrap">
+        <app-empty-state
+          icon="pi-folder"
+          title="Noch keine Ordner"
+          message="Erstelle deinen ersten Ordner, um deine Trading-Regeln zu organisieren."
+          cta="Ersten Ordner erstellen"
+          (onCta)="openFolderModal()"
+        />
+      </div>
+    } @else {
+      <div class="rules-folders">
+        @for (folder of folders(); track folder.id) {
+          <app-rule-folder
+            [folder]="folder"
+            (onToggle)="handleToggleFolder($event)"
+            (onAddRule)="handleAddRule($event)"
+            (onEditRule)="handleEditRule($event)"
+            (onDeleteRule)="handleDeleteRule($event)"
+            (onEditFolder)="handleEditFolder($event)"
+            (onDeleteFolder)="handleDeleteFolder($event)"
+          />
+        }
+      </div>
+    }
+  </div>
+
+</section>
+
+<!-- Folder create/edit modal -->
+<app-rule-folder-modal
+  [visible]="folderModalOpen()"
+  [editFolder]="editingFolder()"
+  (onSave)="handleSaveFolder($event)"
+  (onCancel)="handleCancelFolder()"
+/>

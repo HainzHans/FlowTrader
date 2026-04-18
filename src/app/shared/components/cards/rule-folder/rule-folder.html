@@ -1,0 +1,126 @@
+<div class="folder" [class.folder--collapsed]="folder().isCollapsed" (click)="closeMenu()">
+
+  <!-- Folder Header -->
+  <div class="folder-header" (click)="toggleFolder()">
+
+    <div class="folder-header-left">
+      <button class="folder-chevron"
+              [class.rotated]="!folder().isCollapsed"
+              aria-label="Toggle"
+              type="button">
+        <i class="pi pi-chevron-right"></i>
+      </button>
+
+      <div class="folder-icon"
+           [style.background]="folder().color + '1a'"
+           [style.border-color]="folder().color + '44'">
+        <i class="pi {{ folder().icon }}" [style.color]="folder().color"></i>
+      </div>
+
+      <div class="folder-meta">
+        <span class="folder-name">{{ folder().name }}</span>
+        @if (folder().description) {
+          <span class="folder-description">{{ folder().description }}</span>
+        }
+      </div>
+    </div>
+
+    <div class="folder-header-right" (click)="$event.stopPropagation()">
+
+      <div class="folder-stats">
+        <span class="folder-stat">
+          <i class="pi pi-list"></i>
+          {{ folder().rules.length }}
+        </span>
+        @if (criticalCount > 0) {
+          <span class="folder-stat folder-stat--critical">
+            <i class="pi pi-exclamation-circle"></i>
+            {{ criticalCount }}
+          </span>
+        }
+      </div>
+
+      <button class="folder-add-btn"
+              (click)="openAddModal()"
+              aria-label="Regel hinzufügen"
+              title="Regel hinzufügen"
+              type="button">
+        <i class="pi pi-plus"></i>
+      </button>
+
+      <div class="folder-menu-wrap">
+        <button class="folder-menu-btn"
+                [class.active]="menuOpen()"
+                (click)="toggleMenu($event)"
+                aria-label="Ordner-Optionen"
+                type="button">
+          <i class="pi pi-ellipsis-h"></i>
+        </button>
+
+        @if (menuOpen()) {
+          <div class="folder-menu" (click)="$event.stopPropagation()">
+            <button class="folder-menu-item" (click)="editFolder($event)" type="button">
+              <i class="pi pi-pencil"></i>
+              Bearbeiten
+            </button>
+            <div class="folder-menu-divider"></div>
+            <button class="folder-menu-item folder-menu-item--danger" (click)="deleteFolder($event)" type="button">
+              <i class="pi pi-trash"></i>
+              Ordner löschen
+            </button>
+          </div>
+        }
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Folder Body -->
+  @if (!folder().isCollapsed) {
+    <div class="folder-body">
+      @if (folder().rules.length === 0) {
+        <app-empty-state
+          icon="pi-list"
+          title="Noch keine Regeln"
+          message="Erstelle deine erste Regel für diesen Ordner."
+          cta="Regel erstellen"
+          (onCta)="openAddModal()"
+        />
+      } @else {
+        <div class="folder-rules">
+          @for (rule of folder().rules; track rule.id) {
+            <app-rule-item
+              [rule]="rule"
+              (onEdit)="handleEditRule($event)"
+              (onDelete)="handleDeleteRule($event)"
+            />
+          }
+        </div>
+
+        <button class="folder-add-rule-row" (click)="openAddModal()" type="button">
+          <i class="pi pi-plus"></i>
+          Regel hinzufügen
+        </button>
+      }
+    </div>
+  }
+
+</div>
+
+<!-- Add modal -->
+<app-rule-create-modal
+  [visible]="addModalOpen()"
+  [editRule]="null"
+  [folderName]="folder().name"
+  (onSave)="handleSaveRule($event)"
+  (onCancel)="handleCancelModal()"
+/>
+
+<!-- Edit modal -->
+<app-rule-create-modal
+  [visible]="editingRule() !== null"
+  [editRule]="editingRule()"
+  [folderName]="folder().name"
+  (onSave)="handleSaveRule($event)"
+  (onCancel)="handleCancelModal()"
+/>
