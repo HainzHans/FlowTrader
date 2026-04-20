@@ -1,20 +1,18 @@
 <section class="rules-section">
 
-  <!-- Page Header -->
+  <!-- Header -->
   <div class="rules-header">
     <div class="rules-header-text">
       <h2 class="rules-title">Meine Regeln</h2>
       <p class="rules-subtitle">Definiere und halte deine Trading-Regeln fest</p>
     </div>
-    <button class="btn btn--primary btn--sm rules-new-folder-btn"
-            (click)="openFolderModal()"
-            type="button">
+    <button class="rules-new-folder-btn" (click)="openFolderModal()" type="button">
       <i class="pi pi-plus"></i>
       <span>Ordner erstellen</span>
     </button>
   </div>
 
-  <!-- Stats bar — only shown when rules exist -->
+  <!-- Stats bar -->
   @if (totalRules() > 0) {
     <div class="rules-stats">
       <div class="rules-stat-card">
@@ -31,42 +29,60 @@
           <span class="rules-stat-label">Kritisch</span>
         </div>
       }
-
-      <!-- Priority distribution bar -->
-      <div class="rules-priority-bar">
-        @if (prioritySummary().critical > 0) {
-          <div class="rules-priority-segment"
-               [style.width.%]="(prioritySummary().critical / totalRules()) * 100"
-               [style.background]="priorityConfig.critical.color"
-               title="Kritisch: {{ prioritySummary().critical }}">
-          </div>
-        }
-        @if (prioritySummary().high > 0) {
-          <div class="rules-priority-segment"
-               [style.width.%]="(prioritySummary().high / totalRules()) * 100"
-               [style.background]="priorityConfig.high.color"
-               title="Hoch: {{ prioritySummary().high }}">
-          </div>
-        }
-        @if (prioritySummary().medium > 0) {
-          <div class="rules-priority-segment"
-               [style.width.%]="(prioritySummary().medium / totalRules()) * 100"
-               [style.background]="priorityConfig.medium.color"
-               title="Mittel: {{ prioritySummary().medium }}">
-          </div>
-        }
-        @if (prioritySummary().low > 0) {
-          <div class="rules-priority-segment"
-               [style.width.%]="(prioritySummary().low / totalRules()) * 100"
-               [style.background]="priorityConfig.low.color"
-               title="Niedrig: {{ prioritySummary().low }}">
-          </div>
-        }
+      <div class="rules-priority-wrap">
+        <div class="rules-priority-legend">
+          @if (prioritySummary().critical > 0) {
+            <span class="rules-priority-legend-item">
+              <span class="rules-priority-legend-dot" style="background:#ef4444"></span>
+              Kritisch ({{ prioritySummary().critical }})
+            </span>
+          }
+          @if (prioritySummary().high > 0) {
+            <span class="rules-priority-legend-item">
+              <span class="rules-priority-legend-dot" style="background:#f97316"></span>
+              Hoch ({{ prioritySummary().high }})
+            </span>
+          }
+          @if (prioritySummary().medium > 0) {
+            <span class="rules-priority-legend-item">
+              <span class="rules-priority-legend-dot" style="background:#eab308"></span>
+              Mittel ({{ prioritySummary().medium }})
+            </span>
+          }
+          @if (prioritySummary().low > 0) {
+            <span class="rules-priority-legend-item">
+              <span class="rules-priority-legend-dot" style="background:#22c55e"></span>
+              Niedrig ({{ prioritySummary().low }})
+            </span>
+          }
+        </div>
+        <div class="rules-priority-bar">
+          @if (prioritySummary().critical > 0) {
+            <div class="rules-priority-segment"
+                 [style.width.%]="(prioritySummary().critical / totalRules()) * 100"
+                 [style.background]="priorityConfig.critical.color"></div>
+          }
+          @if (prioritySummary().high > 0) {
+            <div class="rules-priority-segment"
+                 [style.width.%]="(prioritySummary().high / totalRules()) * 100"
+                 [style.background]="priorityConfig.high.color"></div>
+          }
+          @if (prioritySummary().medium > 0) {
+            <div class="rules-priority-segment"
+                 [style.width.%]="(prioritySummary().medium / totalRules()) * 100"
+                 [style.background]="priorityConfig.medium.color"></div>
+          }
+          @if (prioritySummary().low > 0) {
+            <div class="rules-priority-segment"
+                 [style.width.%]="(prioritySummary().low / totalRules()) * 100"
+                 [style.background]="priorityConfig.low.color"></div>
+          }
+        </div>
       </div>
     </div>
   }
 
-  <!-- Folders list -->
+  <!-- Folders -->
   <div class="rules-body">
     @if (folders().length === 0) {
       <div class="rules-empty-wrap">
@@ -97,7 +113,6 @@
 
 </section>
 
-<!-- Folder create/edit modal -->
 <app-rule-folder-modal
   [visible]="folderModalOpen()"
   [editFolder]="editingFolder()"

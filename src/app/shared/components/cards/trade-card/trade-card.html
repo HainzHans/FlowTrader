@@ -1,0 +1,87 @@
+<article class="trade-card" [attr.data-result]="trade().result">
+
+  <!-- ── Image / Chart area ── -->
+  <div class="card-visual">
+
+    <!-- Real image if provided -->
+    <img
+      *ngIf="trade().imageUrl"
+      [src]="trade().imageUrl"
+      [alt]="trade().symbol + ' chart'"
+      class="card-img"
+    />
+
+    <!-- Sparkline placeholder -->
+    <div class="card-sparkline" *ngIf="!trade().imageUrl">
+      <svg viewBox="0 0 210 80" preserveAspectRatio="none" class="sparkline-svg">
+        <defs>
+          <linearGradient [id]="gradientId" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" [attr.stop-color]="gradientColor" stop-opacity="0.35"/>
+            <stop offset="100%" [attr.stop-color]="gradientColor" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <path [attr.d]="sparklineFill" [attr.fill]="'url(#' + gradientId + ')'" />
+        <path [attr.d]="sparklinePath" fill="none" [attr.stroke]="strokeColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </div>
+
+    <!-- Overlays -->
+    <div class="card-overlays">
+      <span class="symbol-chip">{{ trade().symbol }}</span>
+      <span class="result-chip" [attr.data-result]="trade().result">{{ resultLabel }}</span>
+    </div>
+
+    <!-- Market badge -->
+    <span class="market-chip">{{ trade().market }}</span>
+
+  </div>
+
+  <!-- ── Body ── -->
+  <div class="card-body">
+
+    <!-- Top row: PnL + Setup -->
+    <div class="card-top">
+      <div class="card-setup">
+        <p class="setup-label">Setup</p>
+        <p class="setup-name">{{ trade().setup }}</p>
+      </div>
+      <div class="card-pnl" [attr.data-result]="trade().result">
+        <p class="pnl-value">{{ pnlFormatted }}</p>
+        <p class="pnl-percent">{{ trade().pnlPercent > 0 ? '+' : '' }}{{ trade().pnlPercent }}%</p>
+      </div>
+    </div>
+
+    <!-- Meta row -->
+    <div class="card-meta">
+      <span class="meta-pill">
+        <i class="pi pi-calendar"></i>
+        {{ trade().date }}
+      </span>
+      <span class="meta-pill" *ngIf="trade().rr > 0">
+        <i class="pi pi-chart-bar"></i>
+        R:R {{ trade().rr }}
+      </span>
+    </div>
+
+    <!-- Notes snippet -->
+    <p class="card-notes" *ngIf="trade().notes">{{ trade().notes }}</p>
+
+    <!-- Tags -->
+    <div class="card-tags" *ngIf="trade().tags.length">
+      <span class="tag" *ngFor="let tag of trade().tags">#{{ tag }}</span>
+    </div>
+
+  </div>
+
+  <!-- ── Actions ── -->
+  <div class="card-actions">
+    <button class="action-edit" (click)="onEdit.emit(trade())">
+      <i class="pi pi-pencil"></i>
+      Bearbeiten
+    </button>
+    <button class="action-delete" (click)="onDelete.emit(trade().id)" aria-label="Löschen">
+      <i class="pi pi-trash"></i>
+    </button>
+  </div>
+
+</article>

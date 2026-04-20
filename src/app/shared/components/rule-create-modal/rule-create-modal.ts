@@ -2,7 +2,6 @@ import { Component, input, output, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Rule, RulePriority, PRIORITY_CONFIG } from '../../models/rule.model';
-import { RulePriorityBadge } from '../rule-priority-badge/rule-priority-badge';
 
 export interface RuleFormData {
   title: string;
@@ -13,7 +12,7 @@ export interface RuleFormData {
 @Component({
   selector: 'app-rule-create-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule, RulePriorityBadge],
+  imports: [CommonModule, FormsModule],
   templateUrl: './rule-create-modal.html',
   styleUrl: './rule-create-modal.css',
 })

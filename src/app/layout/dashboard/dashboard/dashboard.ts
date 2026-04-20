@@ -1,6 +1,7 @@
 import {Component, computed, signal} from '@angular/core';
 import {NoteSection} from '../components/note-section/note-section';
 import {RulesComponent} from '../components/rules-component/rules-component';
+import {TradesComponent} from '../components/trades-component/trades-component';
 
 export interface NavItem {
   icon:      string;
@@ -14,6 +15,7 @@ export interface NavItem {
   imports: [
     NoteSection,
     RulesComponent,
+    TradesComponent,
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
@@ -26,7 +28,7 @@ export class Dashboard {
   userItems: NavItem[] = [
     { icon: 'pi-pencil',    label: 'Notizen', key: 'notes'     },
     { icon: 'pi-verified', label: 'Regeln',   key: 'rules' },
-    { icon: 'pi-arrow-right-arrow-left', label: 'Trades',   key: 'arrow-right-arrow-left' },
+    { icon: 'pi-arrow-right-arrow-left', label: 'Trades',   key: 'trades' },
   ];
 
   learnItems: NavItem[] = [

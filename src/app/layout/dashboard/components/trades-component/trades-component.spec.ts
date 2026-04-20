@@ -1,0 +1,22 @@
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { TradesComponent } from './trades-component';
+
+describe('TradesComponent', () => {
+  let component: TradesComponent;
+  let fixture: ComponentFixture<TradesComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [TradesComponent],
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(TradesComponent);
+    component = fixture.componentInstance;
+    await fixture.whenStable();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
