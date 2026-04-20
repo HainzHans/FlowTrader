@@ -1,10 +1,10 @@
 import { Component, computed, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {TradeCard} from '../../../../shared/components/cards/trade-card/trade-card';
-import {TradeFormData, TradeModal} from '../../../../shared/components/trade-modal/trade-modal';
-import {DeleteConfirm} from '../../../../shared/components/delete-confirm/delete-confirm';
-import {TradeService} from '../../../../services/trade-service';
-import {Trade} from '../../../../shared/models/trade.model';
+import { TradeCard } from '../../../../shared/components/cards/trade-card/trade-card';
+import { TradeFormData, TradeModal } from '../../../../shared/components/trade-modal/trade-modal';
+import { DeleteConfirm } from '../../../../shared/components/delete-confirm/delete-confirm';
+import { TradeService } from '../../../../services/trade-service';
+import { Trade } from '../../../../shared/models/trade.model';
 
 type Filter = 'all' | 'win' | 'loss' | 'breakeven';
 
@@ -18,7 +18,7 @@ type Filter = 'all' | 'win' | 'loss' | 'breakeven';
 export class TradesComponent {
   private svc = inject(TradeService);
 
-  readonly stats    = this.svc.stats;
+  readonly stats     = this.svc.stats;
   readonly allTrades = this.svc.trades;
 
   activeFilter = signal<Filter>('all');
@@ -41,7 +41,7 @@ export class TradesComponent {
     return list;
   });
 
-  // ── Modal ──
+  // ── Modal ──────────────────────────────────
   openAdd() {
     this.editingTrade.set(null);
     this.showModal.set(true);
@@ -67,19 +67,20 @@ export class TradesComponent {
     this.closeModal();
   }
 
-  // ── Delete ──
+  // ── Delete ──────────────────────────────────
   requestDelete(id: string) { this.deleteId.set(id); }
-  cancelDelete()  { this.deleteId.set(null); }
+  cancelDelete()            { this.deleteId.set(null); }
   confirmDelete() {
     const id = this.deleteId();
     if (id) this.svc.delete(id);
     this.deleteId.set(null);
   }
 
-  // ── Helpers ──
+  // ── Helpers ────────────────────────────────
   setFilter(f: Filter) { this.activeFilter.set(f); }
 
   formatPnl(n: number): string {
-    return (n >= 0 ? '+' : '') + n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '$';
+    return (n >= 0 ? '+' : '') +
+      n.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '$';
   }
 }

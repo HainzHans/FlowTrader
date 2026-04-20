@@ -1,183 +1,151 @@
-<div class="trades-page">
+<div class="trades-wrap">
 
-  <!-- ══ Page Hero ══ -->
-  <header class="page-hero">
-    <div class="hero-glow"></div>
-    <div class="container">
-      <div class="hero-inner">
-        <div class="hero-text">
-          <p class="section-label">Trade Journal</p>
-          <h1 class="hero-title">Deine Trades</h1>
-          <p class="hero-sub">Dokumentiere jeden Trade. Lerne aus jedem Setup.</p>
+  <!-- ── Header ── -->
+  <div class="trades-header">
+    <div class="trades-header-left">
+      <h2 class="trades-title">Trade Journal</h2>
+      <p class="trades-subtitle">Dokumentiere jeden Trade. Lerne aus jedem Setup.</p>
+    </div>
+    <button class="add-trade-btn" (click)="openAdd()">
+      <i class="pi pi-plus"></i>
+      Trade hinzufügen
+    </button>
+  </div>
+
+  <!-- ── Stats Strip ── -->
+  <div class="stats-strip">
+    <div class="stat-block">
+      <span class="stat-label">Gesamt</span>
+      <span class="stat-num">{{ stats().total }}</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-block">
+      <span class="stat-label">Wins</span>
+      <span class="stat-num stat-num--win">{{ stats().wins }}</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-block">
+      <span class="stat-label">Losses</span>
+      <span class="stat-num stat-num--loss">{{ stats().losses }}</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-block">
+      <span class="stat-label">Winrate</span>
+      <div class="stat-bar-wrap">
+        <span class="stat-num">{{ stats().winRate }}%</span>
+        <div class="mini-bar">
+          <div class="mini-bar-fill" [style.width.%]="stats().winRate"></div>
         </div>
+      </div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-block">
+      <span class="stat-label">Gesamt P&amp;L</span>
+      <span class="stat-num"
+            [class.stat-num--win]="stats().totalPnl > 0"
+            [class.stat-num--loss]="stats().totalPnl < 0">
+        {{ formatPnl(stats().totalPnl) }}
+      </span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-block">
+      <span class="stat-label">Ø R:R</span>
+      <span class="stat-num">{{ stats().avgRR }}</span>
+    </div>
+  </div>
+
+  <!-- ── Toolbar ── -->
+  <div class="trades-toolbar">
+
+    <!-- Search -->
+    <div class="search-wrap">
+      <i class="pi pi-search search-icon"></i>
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Symbol, Setup, Tag..."
+        [value]="searchQuery()"
+        (input)="searchQuery.set($any($event.target).value)"
+      />
+      @if (searchQuery()) {
+        <button class="search-clear" (click)="searchQuery.set('')" aria-label="Leeren">
+          <i class="pi pi-times"></i>
+        </button>
+      }
+    </div>
+
+    <!-- Filter pills -->
+    <div class="filter-pills">
+      <button class="fpill" [class.active]="activeFilter() === 'all'" (click)="setFilter('all')">
+        Alle
+        <span class="fpill-count">{{ allTrades().length }}</span>
+      </button>
+      <button class="fpill fpill--win" [class.active]="activeFilter() === 'win'" (click)="setFilter('win')">
+        <span class="fdot fdot--win"></span> Wins
+      </button>
+      <button class="fpill fpill--loss" [class.active]="activeFilter() === 'loss'" (click)="setFilter('loss')">
+        <span class="fdot fdot--loss"></span> Losses
+      </button>
+      <button class="fpill" [class.active]="activeFilter() === 'breakeven'" (click)="setFilter('breakeven')">
+        BE
+      </button>
+    </div>
+
+  </div>
+
+  <!-- ── Grid ── -->
+  <div class="trades-content">
+
+    <!-- Empty state -->
+    @if (filteredTrades().length === 0) {
+      <div class="empty-state">
+        <div class="empty-gfx">
+          <svg viewBox="0 0 80 80" fill="none">
+            <circle cx="40" cy="40" r="39" stroke="var(--border-default)" stroke-width="1"/>
+            <path d="M22 52 C28 38 36 28 40 24 C44 28 52 38 58 52"
+                  stroke="var(--border-strong)" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+            <circle cx="40" cy="22" r="3" fill="var(--accent)"/>
+          </svg>
+        </div>
+        <h3>Keine Trades gefunden</h3>
+        @if (searchQuery()) {
+          <p>Keine Ergebnisse für „{{ searchQuery() }}"</p>
+        }
+        @if (!searchQuery()) {
+          <p>Füge deinen ersten Trade hinzu.</p>
+        }
         <button class="add-trade-btn" (click)="openAdd()">
-          <i class="pi pi-plus"></i>
-          Trade hinzufügen
+          <i class="pi pi-plus"></i> Ersten Trade hinzufügen
         </button>
       </div>
-    </div>
-  </header>
+    }
 
-  <!-- ══ Stats Strip ══ -->
-  <div class="stats-strip">
-    <div class="container">
-      <div class="stats-row">
-
-        <div class="stat-block">
-          <span class="stat-label">Trades gesamt</span>
-          <span class="stat-num">{{ stats().total }}</span>
-        </div>
-
-        <div class="stat-divider"></div>
-
-        <div class="stat-block">
-          <span class="stat-label">Wins</span>
-          <span class="stat-num stat-num--win">{{ stats().wins }}</span>
-        </div>
-
-        <div class="stat-divider"></div>
-
-        <div class="stat-block">
-          <span class="stat-label">Losses</span>
-          <span class="stat-num stat-num--loss">{{ stats().losses }}</span>
-        </div>
-
-        <div class="stat-divider"></div>
-
-        <div class="stat-block">
-          <span class="stat-label">Winrate</span>
-          <div class="stat-bar-wrap">
-            <span class="stat-num">{{ stats().winRate }}%</span>
-            <div class="mini-bar">
-              <div class="mini-bar-fill" [style.width.%]="stats().winRate"></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="stat-divider"></div>
-
-        <div class="stat-block" [class.is-pos]="stats().totalPnl > 0" [class.is-neg]="stats().totalPnl < 0">
-          <span class="stat-label">Gesamt P&amp;L</span>
-          <span class="stat-num" [class.stat-num--win]="stats().totalPnl > 0" [class.stat-num--loss]="stats().totalPnl < 0">
-            {{ formatPnl(stats().totalPnl) }}
-          </span>
-        </div>
-
-        <div class="stat-divider"></div>
-
-        <div class="stat-block">
-          <span class="stat-label">Ø R:R</span>
-          <span class="stat-num">{{ stats().avgRR }}</span>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-  <!-- ══ Toolbar ══ -->
-  <div class="toolbar">
-    <div class="container">
-      <div class="toolbar-row">
-
-        <!-- Search -->
-        <div class="search-wrap">
-          <i class="pi pi-search search-icon"></i>
-          <input
-            type="text"
-            class="search-input"
-            placeholder="Symbol, Setup, Tag..."
-            [value]="searchQuery()"
-            (input)="searchQuery.set($any($event.target).value)"
+    <!-- Grid -->
+    @if (filteredTrades().length > 0) {
+      <div class="trades-grid">
+        @for (trade of filteredTrades(); track trade.id) {
+          <app-trade-card
+            [trade]="trade"
+            (onEdit)="openEdit($event)"
+            (onDelete)="requestDelete($event)"
+            [style.animation-delay]="'calc(' + filteredTrades().indexOf(trade) * 40 + 'ms)'"
           />
-          @if (searchQuery()) {
-            <button
-              class="search-clear"
-              (click)="searchQuery.set('')"
-              aria-label="Suche leeren">
-              <i class="pi pi-times"></i>
-            </button>
-          }
-
-        </div>
-
-        <!-- Filter pills -->
-        <div class="filter-pills">
-          <button class="fpill" [class.active]="activeFilter() === 'all'" (click)="setFilter('all')">
-            Alle
-            <span class="fpill-count">{{ allTrades().length }}</span>
-          </button>
-          <button class="fpill fpill--win" [class.active]="activeFilter() === 'win'" (click)="setFilter('win')">
-            <span class="fdot fdot--win"></span> Wins
-          </button>
-          <button class="fpill fpill--loss" [class.active]="activeFilter() === 'loss'" (click)="setFilter('loss')">
-            <span class="fdot fdot--loss"></span> Losses
-          </button>
-          <button class="fpill" [class.active]="activeFilter() === 'breakeven'" (click)="setFilter('breakeven')">
-            BE
-          </button>
-        </div>
-
+        }
       </div>
-    </div>
+    }
+
+    <!-- Count -->
+    @if (filteredTrades().length > 0) {
+      <p class="results-line">
+        {{ filteredTrades().length }} Trade{{ filteredTrades().length === 1 ? '' : 's' }} angezeigt
+      </p>
+    }
+
   </div>
-
-  <!-- ══ Trades Grid ══ -->
-  <main class="trades-main">
-    <div class="container">
-
-      <!-- Empty state -->
-      @if (filteredTrades().length === 0) {
-        <div class="empty-state" >
-          <div class="empty-gfx">
-            <svg viewBox="0 0 80 80" fill="none">
-              <circle cx="40" cy="40" r="39" stroke="var(--border-default)" stroke-width="1"/>
-              <path d="M22 52 C28 38 36 28 40 24 C44 28 52 38 58 52" stroke="var(--border-strong)" stroke-width="1.5" stroke-linecap="round" fill="none"/>
-              <circle cx="40" cy="22" r="3" fill="var(--accent)"/>
-            </svg>
-          </div>
-          <h3>Keine Trades gefunden</h3>
-          @if (searchQuery()) {
-            <p>Keine Ergebnisse für „{{ searchQuery() }}"</p>
-          }
-          @if (!searchQuery()) {
-            <p>Füge deinen ersten Trade hinzu.</p>
-          }
-          <button class="add-trade-btn add-trade-btn--sm" (click)="openAdd()">
-            <i class="pi pi-plus"></i>
-            Ersten Trade hinzufügen
-          </button>
-        </div>
-      }
-
-
-      <!-- Grid -->
-      @if (filteredTrades().length > 0) {
-        <div class="trades-grid">
-          @for (trade of filteredTrades(); track trade.id) {
-            <app-trade-card
-              [trade]="trade"
-              (onEdit)="openEdit($event)"
-              (onDelete)="requestDelete($event)"
-              [style.animation-delay]="'calc(' + filteredTrades().indexOf(trade) * 40 + 'ms)'"
-            />
-          }
-        </div>
-      }
-
-
-      <!-- Count line -->
-      @if (filteredTrades().length > 0) {
-        <p class="results-line">
-          {{ filteredTrades().length }} Trade{{ filteredTrades().length === 1 ? '' : 's' }} angezeigt
-        </p>
-      }
-
-    </div>
-  </main>
 
 </div>
 
-<!-- ══ Modal ══ -->
+<!-- ── Modal ── -->
 @if (showModal()) {
   <app-trade-modal
     [editTrade]="editingTrade()"
@@ -186,12 +154,10 @@
   />
 }
 
-
-<!-- ══ Delete Confirm ══ -->
+<!-- ── Delete Confirm ── -->
 @if (deleteId()) {
   <app-delete-confirm
     (onConfirm)="confirmDelete()"
     (onCancel)="cancelDelete()"
   />
 }
-

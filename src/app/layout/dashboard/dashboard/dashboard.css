@@ -303,7 +303,6 @@
   transition: opacity var(--transition);
 }
 
-/* Hide label text when collapsed, keep a divider line visible */
 .sidebar:not(.expanded) .nav-section-title {
   opacity: 0;
 }
@@ -398,19 +397,19 @@
 /* ── Main Content ────────────────────────────────────────── */
 .main-content {
   flex: 1;
-  padding: 40px 48px;
+  /* Kleineres Padding — kein top-padding nötig da die Komponenten
+     ihren eigenen Header haben */
+  padding: var(--space-6) var(--space-8);
   overflow-y: auto;
   color: var(--text-primary);
   font-family: 'DM Sans', sans-serif;
+  /* Stellt sicher dass die Komponente den vollen Platz bekommt */
+  display: flex;
+  flex-direction: column;
+}
 
-  h1 {
-    font-size: 26px;
-    font-weight: 700;
-    margin-bottom: 10px;
-  }
-
-  p {
-    color: var(--text-muted);
-    font-size: 14px;
-  }
+/* Alle direkten Kind-Komponenten füllen den Platz */
+.main-content > * {
+  flex: 1;
+  min-height: 0;
 }
