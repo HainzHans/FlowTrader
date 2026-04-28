@@ -1,1 +1,7 @@
-<router-outlet></router-outlet>
+@if (value === 'johannes') {
+  <router-outlet></router-outlet>
+}@else {
+  <div class="card flex justify-center">
+    <input type="text" pInputText [(ngModel)]="value" />
+  </div>
+}
