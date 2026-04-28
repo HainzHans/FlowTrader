@@ -1,6 +1,15 @@
-<button class="btn btn--accent btn--lg" style="width: 100%; justify-content: center;">
-  @if (buttonIcon()) {
-    <i class="pi {{buttonIcon()}}"></i>
-  }
-  {{buttonText()}}
+<button class="btn btn--accent"
+        [class.btn--lg]="isLarge()"
+        [class.btn--sm]="!isLarge()"
+        [class.btn--icon-only]="buttonIcon() && !buttonText()">
+
+  <div class="btn__content">
+    @if (buttonIcon()) {
+      <i class="pi {{ buttonIcon() }} btn__icon"></i>
+    }
+    @if (buttonText()) {
+      <span class="btn__text">{{ buttonText() }}</span>
+    }
+  </div>
+
 </button>

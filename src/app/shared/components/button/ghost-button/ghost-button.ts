@@ -13,7 +13,7 @@ export class GhostButton {
   }
 
   navigateTo() {
-    this.router.navigate(['/dashboard']);
+    this.router.navigate(['/auth']);
   }
 
 }

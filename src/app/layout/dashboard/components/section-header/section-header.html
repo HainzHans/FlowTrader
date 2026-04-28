@@ -1,0 +1,19 @@
+<div class="trades-section">
+  <div class="trades-header">
+    <div class="trades-header-left">
+      <h2 class="trades-title">{{ title() }}</h2>
+      <p class="trades-subtitle">{{ subTitle() }}</p>
+    </div>
+    <div class="trades-header-right">
+      <app-accent-button
+        [isLarge]="false"
+        [buttonIcon]="'pi-plus'"
+        [buttonText]="'Trade hinzufügen'"
+      ></app-accent-button>
+      <app-accent-button
+        [isLarge]="false"
+        [buttonIcon]="'pi-file-import'"
+      ></app-accent-button>
+    </div>
+  </div>
+</div>

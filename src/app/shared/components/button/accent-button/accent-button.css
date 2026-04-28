@@ -9,3 +9,28 @@
   box-shadow: 0 0 28px rgba(124, 58, 237, 0.45);
   transform: translateY(-1px);
 }
+
+.btn__content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* --- Icon --- */
+.btn__icon {
+  display: inline-flex;
+  align-items: center;
+}
+/* --- Icon Only Variant --- */
+.btn--icon-only {
+  padding: 0.6rem; /* quadratisch */
+}
+
+.btn--icon-only .btn__content {
+  gap: 0; /* kein Abstand, da kein Text */
+}
+
+.btn--icon-only .btn__icon {
+  padding: 0.2rem;
+}

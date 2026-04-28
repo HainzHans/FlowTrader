@@ -3,7 +3,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Trade, MARKET_OPTIONS, SETUP_OPTIONS } from '../../../shared/models/trade.model';
+import { Trade, MARKET_OPTIONS, SETUP_OPTIONS } from '../../models/trade.model';
 
 export interface TradeFormData {
   symbol: string;

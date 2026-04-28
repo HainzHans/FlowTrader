@@ -1,7 +1,7 @@
-import {Component, computed, signal} from '@angular/core';
-import {NoteSection} from '../components/note-section/note-section';
-import {RulesComponent} from '../components/rules-component/rules-component';
-import {TradesComponent} from '../components/trades-component/trades-component';
+import {Component, computed, inject, signal} from '@angular/core';
+import {TradesComponent} from '../sections/trades-component/trades-component';
+import {TradesSection} from '../sections/trades-section/trades-section';
+import {AuthService} from '../../../services/auth-service/auth-service';
 
 export interface NavItem {
   icon:      string;
@@ -13,14 +13,14 @@ export interface NavItem {
 @Component({
   selector: 'app-dashboard',
   imports: [
-    NoteSection,
-    RulesComponent,
     TradesComponent,
+    TradesSection,
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
 export class Dashboard {
+  private authService = inject(AuthService);
 
   isExpanded  = signal(true);
   activeKey   = signal<string>('admin-overview');
@@ -29,6 +29,7 @@ export class Dashboard {
     { icon: 'pi-pencil',    label: 'Notizen', key: 'notes'     },
     { icon: 'pi-verified', label: 'Regeln',   key: 'rules' },
     { icon: 'pi-arrow-right-arrow-left', label: 'Trades',   key: 'trades' },
+    { icon: 'pi-arrow-right-arrow-left', label: 'Trades',   key: 'trades-new' },
   ];
 
   learnItems: NavItem[] = [
@@ -59,6 +60,6 @@ export class Dashboard {
   }
 
   logout() {
-
+    this.authService.signOut().then();
   }
 }

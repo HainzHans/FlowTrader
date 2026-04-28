@@ -10,5 +10,6 @@ export class AccentButton {
 
   buttonText = input<string>('');
   buttonIcon = input<string>('');
+  isLarge = input.required<boolean>()
 
 }
