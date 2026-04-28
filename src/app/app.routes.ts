@@ -1,8 +1,8 @@
 import { Routes } from '@angular/router';
-import {LandingPage} from './layout/landing-page/landing-page/landing-page';
-import {Dashboard} from './layout/dashboard/dashboard/dashboard';
-import {AuthPage} from './layout/auth-page/auth-page';
-import {authGuard, publicGuard} from './guard/auth-guard';
+import {LandingPage} from './features/landing/landing-page/landing-page';
+import {Dashboard} from './features/dashboard/dashboard/dashboard';
+import {AuthPage} from './features/auth/auth-page/auth-page';
+import {authGuard, publicGuard} from './core/guard/auth-guard';
 
 export const routes: Routes = [
   { path: '', component: LandingPage},

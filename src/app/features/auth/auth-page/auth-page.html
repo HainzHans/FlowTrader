@@ -1,0 +1,139 @@
+<div class="auth-root">
+
+  <!-- Background grid is inherited from body::before (styles.css) -->
+
+  <!-- Ambient glow -->
+  <div class="auth-glow"></div>
+
+  <!-- Card -->
+  <div class="auth-card">
+
+    <!-- Logo -->
+    <a href="/public" class="auth-logo">
+      <div class="auth-logo-mark">FT</div>
+      <span class="auth-logo-name">FlowTrader</span>
+    </a>
+
+    <!-- Heading -->
+    <div class="auth-heading">
+      <h1 class="auth-title">
+        {{ mode() === 'login' ? 'Willkommen zurück' : 'Konto erstellen' }}
+      </h1>
+      <p class="auth-subtitle">
+        {{ mode() === 'login'
+        ? 'Melde dich mit deiner E-Mail-Adresse an.'
+        : 'Starte kostenlos und handle strukturierter.' }}
+      </p>
+    </div>
+
+    <!-- Tab switcher -->
+    <div class="auth-tabs">
+      <button
+        class="auth-tab"
+        [class.active]="mode() === 'login'"
+        (click)="setMode('login')"
+        type="button">
+        Einloggen
+      </button>
+      <button
+        class="auth-tab"
+        [class.active]="mode() === 'register'"
+        (click)="setMode('register')"
+        type="button">
+        Registrieren
+      </button>
+      <div class="auth-tab-indicator" [class.right]="mode() === 'register'"></div>
+    </div>
+
+    <!-- Success banner -->
+    @if (success()) {
+      <div class="auth-banner auth-banner--success">
+        <i class="pi pi-check-circle"></i>
+        <span>{{ success() }}</span>
+      </div>
+    }
+
+    <!-- Error banner -->
+    @if (error()) {
+      <div class="auth-banner auth-banner--error">
+        <i class="pi pi-exclamation-circle"></i>
+        <span>{{ error() }}</span>
+      </div>
+    }
+
+    <!-- Form -->
+    <div class="auth-form">
+
+      <!-- Email -->
+      <div class="auth-field">
+        <label class="auth-label" for="auth-email">E-Mail</label>
+        <div class="auth-input-wrap">
+          <i class="pi pi-envelope auth-input-icon"></i>
+          <input
+            id="auth-email"
+            class="auth-input"
+            type="email"
+            placeholder="deine@email.com"
+            autocomplete="email"
+            [value]="email()"
+            (input)="email.set($any($event.target).value)"
+            (keydown.enter)="submit()"
+          />
+        </div>
+      </div>
+
+      <!-- Password -->
+      <div class="auth-field">
+        <label class="auth-label" for="auth-password">Passwort</label>
+        <div class="auth-input-wrap">
+          <i class="pi pi-lock auth-input-icon"></i>
+          <input
+            id="auth-password"
+            class="auth-input"
+            type="password"
+            [placeholder]="mode() === 'register' ? 'Mindestens 6 Zeichen' : '••••••••'"
+            autocomplete="{{ mode() === 'login' ? 'current-password' : 'new-password' }}"
+            [value]="password()"
+            (input)="password.set($any($event.target).value)"
+            (keydown.enter)="submit()"
+          />
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <button
+        class="auth-submit"
+        (click)="submit()"
+        [disabled]="loading()"
+        type="button">
+        @if (loading()) {
+          <span class="auth-spinner"></span>
+          <span>Bitte warten…</span>
+        } @else {
+          <i [class]="mode() === 'login' ? 'pi pi-sign-in' : 'pi pi-user-plus'"></i>
+          <span>{{ mode() === 'login' ? 'Einloggen' : 'Konto erstellen' }}</span>
+        }
+      </button>
+
+    </div>
+
+    <!-- Footer switch -->
+    <p class="auth-switch">
+      {{ mode() === 'login' ? 'Noch kein Konto?' : 'Bereits registriert?' }}
+      <button
+        class="auth-switch-btn"
+        (click)="setMode(mode() === 'login' ? 'register' : 'login')"
+        type="button">
+        {{ mode() === 'login' ? 'Jetzt registrieren' : 'Zum Login' }}
+      </button>
+    </p>
+
+  </div>
+
+  <!-- Back to landing -->
+  <a href="/public" class="auth-back">
+    <i class="pi pi-arrow-left"></i>
+    Zurück zur Startseite
+  </a>
+
+</div>
