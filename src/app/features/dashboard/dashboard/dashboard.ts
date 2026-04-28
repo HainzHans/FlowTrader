@@ -24,17 +24,13 @@ export class Dashboard {
   activeKey   = signal<string>('admin-overview');
 
   userItems: NavItem[] = [
-    { icon: 'pi-pencil',    label: 'Notizen', key: 'notes'     },
+    { icon: 'pi-chart-line',    label: 'Dashboard', key: 'dashboard' },
     { icon: 'pi-verified', label: 'Regeln',   key: 'rules' },
     { icon: 'pi-arrow-right-arrow-left', label: 'Trades',   key: 'trades' },
-    { icon: 'pi-arrow-right-arrow-left', label: 'Trades',   key: 'trades-new' },
   ];
 
   learnItems: NavItem[] = [
     { icon: 'pi-chart-bar',    label: 'Analyse', key: 'chart-bar'     },
-    { icon: 'pi-globe', label: 'News lesen',   key: 'globe' },
-    { icon: 'pi-sliders-h', label: 'Setup',   key: 'sliders-h' },
-    { icon: 'pi-arrow-right-arrow-left', label: 'Trades',   key: 'arrw-right-arrow-left' },
   ];
 
   adminItems: NavItem[] = [
