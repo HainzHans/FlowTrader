@@ -92,9 +92,7 @@
     <main class="main-content">
 
       @switch (activeKey()) {
-        @case('trades') {
-          <app-trades-component></app-trades-component>
-        }@case('trades-new') {
+        @case('trades-new') {
           <app-trades-section></app-trades-section>
         }
 

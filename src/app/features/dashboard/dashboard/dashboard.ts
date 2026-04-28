@@ -1,5 +1,4 @@
 import {Component, computed, inject, signal} from '@angular/core';
-import {TradesComponent} from '../sections/trades-component/trades-component';
 import {TradesSection} from '../sections/trades-section/trades-section';
 import {AuthService} from '../../../core/services/auth-service/auth-service';
 
@@ -13,7 +12,6 @@ export interface NavItem {
 @Component({
   selector: 'app-dashboard',
   imports: [
-    TradesComponent,
     TradesSection,
   ],
   templateUrl: './dashboard.html',
