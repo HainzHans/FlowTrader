@@ -1,0 +1,375 @@
+<div class="profile-root">
+  <div class="profile-glow"></div>
+
+  <!-- ── Top bar ── -->
+  <header class="profile-topbar">
+    <button class="back-btn" (click)="goBack()">
+      <i class="pi pi-arrow-left"></i>
+      <span>Dashboard</span>
+    </button>
+    <div class="topbar-brand">
+      <div class="logo-mark">FT</div>
+      <span class="logo-name">FlowTrader</span>
+    </div>
+    <button class="topbar-logout" (click)="logout()">
+      <i class="pi pi-sign-out"></i>
+    </button>
+  </header>
+
+  <!-- ── Page ── -->
+  <div class="profile-page">
+
+    <!-- Left: sidebar -->
+    <aside class="profile-aside">
+
+      <!-- Identity card -->
+      <div class="identity-card">
+        <div class="identity-avatar">
+          <span>{{ avatarInitial() }}</span>
+          <span class="identity-avatar-ring"></span>
+        </div>
+        <div class="identity-info">
+          <p class="identity-name">{{ displayName() || 'Kein Name' }}</p>
+          <p class="identity-email">{{ email() }}</p>
+        </div>
+        <div class="identity-plan">
+          <span class="plan-chip">
+            <i class="pi pi-star-fill"></i>
+            Pro Plan
+          </span>
+        </div>
+      </div>
+
+      <!-- Nav pills -->
+      <nav class="aside-nav">
+        <button class="aside-nav-item" [class.active]="activeTab() === 'profile'" (click)="setTab('profile')">
+          <span class="nav-item-icon"><i class="pi pi-user"></i></span>
+          <span class="nav-item-label">Profil</span>
+          <i class="pi pi-chevron-right nav-item-arrow"></i>
+        </button>
+        <button class="aside-nav-item" [class.active]="activeTab() === 'security'" (click)="setTab('security')">
+          <span class="nav-item-icon"><i class="pi pi-lock"></i></span>
+          <span class="nav-item-label">Sicherheit</span>
+          <i class="pi pi-chevron-right nav-item-arrow"></i>
+        </button>
+        <button class="aside-nav-item" [class.active]="activeTab() === 'api'" (click)="setTab('api')">
+          <span class="nav-item-icon"><i class="pi pi-key"></i></span>
+          <span class="nav-item-label">API-Key</span>
+          <i class="pi pi-chevron-right nav-item-arrow"></i>
+        </button>
+        <button class="aside-nav-item aside-nav-item--sub" [class.active]="activeTab() === 'subscription'" (click)="setTab('subscription')">
+          <span class="nav-item-icon"><i class="pi pi-credit-card"></i></span>
+          <span class="nav-item-label">Abonnement</span>
+          <i class="pi pi-chevron-right nav-item-arrow"></i>
+        </button>
+      </nav>
+
+      <!-- Meta -->
+      <div class="aside-meta">
+        <div class="aside-meta-row">
+          <span class="aside-meta-key">Dabei seit</span>
+          <span class="aside-meta-val">{{ joinedAt() }}</span>
+        </div>
+        <div class="aside-meta-row">
+          <span class="aside-meta-key">ID</span>
+          <span class="aside-meta-val mono">{{ userId().slice(0,8) }}…</span>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- Right: content panels -->
+    <main class="profile-main">
+
+      <!-- ══ Profil ══ -->
+      @if (activeTab() === 'profile') {
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-head-icon accent">
+              <i class="pi pi-user"></i>
+            </div>
+            <div class="panel-head-text">
+              <h2>Profil bearbeiten</h2>
+              <p>Dein öffentlicher Anzeigename und deine Kontodaten.</p>
+            </div>
+          </div>
+
+          @if (successMsg()) {
+            <div class="alert alert--ok"><i class="pi pi-check-circle"></i> {{ successMsg() }}</div>
+          }
+          @if (errorMsg()) {
+            <div class="alert alert--err"><i class="pi pi-times-circle"></i> {{ errorMsg() }}</div>
+          }
+
+          <div class="fields">
+            <div class="field">
+              <label class="field-label">E-Mail-Adresse</label>
+              <div class="field-input-wrap">
+                <i class="pi pi-envelope field-icon"></i>
+                <input class="field-input field-input--locked" type="email" [value]="email()" disabled readonly />
+                <span class="field-lock-badge"><i class="pi pi-lock"></i></span>
+              </div>
+              <span class="field-hint">Kann nicht geändert werden.</span>
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="dn">Anzeigename</label>
+              <div class="field-input-wrap">
+                <i class="pi pi-at field-icon"></i>
+                <input id="dn" class="field-input" type="text" placeholder="z.B. MaxTrader"
+                       [ngModel]="displayName()" (ngModelChange)="displayName.set($event)" />
+              </div>
+            </div>
+          </div>
+
+          <div class="panel-footer">
+            <button class="btn-primary" (click)="saveProfile()" [disabled]="saving()">
+              @if (saving()) { <span class="spin"></span> Speichern… }
+              @else { <i class="pi pi-check"></i> Speichern }
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- ══ Sicherheit ══ -->
+      @if (activeTab() === 'security') {
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-head-icon accent">
+              <i class="pi pi-shield"></i>
+            </div>
+            <div class="panel-head-text">
+              <h2>Passwort ändern</h2>
+              <p>Wähle ein starkes Passwort mit mindestens 6 Zeichen.</p>
+            </div>
+          </div>
+
+          @if (pwSuccessMsg()) {
+            <div class="alert alert--ok"><i class="pi pi-check-circle"></i> {{ pwSuccessMsg() }}</div>
+          }
+          @if (pwErrorMsg()) {
+            <div class="alert alert--err"><i class="pi pi-times-circle"></i> {{ pwErrorMsg() }}</div>
+          }
+
+          <div class="fields">
+            <div class="field">
+              <label class="field-label" for="npw">Neues Passwort</label>
+              <div class="field-input-wrap">
+                <i class="pi pi-lock field-icon"></i>
+                <input id="npw" class="field-input"
+                       [type]="showNewPw() ? 'text' : 'password'"
+                       placeholder="Mindestens 6 Zeichen"
+                       [ngModel]="newPassword()" (ngModelChange)="newPassword.set($event)" />
+                <button class="field-eye" type="button" (click)="showNewPw.update(v => !v)" tabindex="-1">
+                  <i class="pi" [class.pi-eye]="!showNewPw()" [class.pi-eye-slash]="showNewPw()"></i>
+                </button>
+              </div>
+
+              <!-- Strength bar -->
+              @if (newPassword().length > 0) {
+                <div class="pw-meter">
+                  <div class="pw-meter-bars">
+                    <span class="pw-bar" [class.filled]="pwStrength() >= 1" [class.s1]="pwStrength() === 1" [class.s2]="pwStrength() === 2" [class.s3]="pwStrength() === 3" [class.s4]="pwStrength() === 4"></span>
+                    <span class="pw-bar" [class.filled]="pwStrength() >= 2" [class.s2]="pwStrength() === 2" [class.s3]="pwStrength() === 3" [class.s4]="pwStrength() === 4"></span>
+                    <span class="pw-bar" [class.filled]="pwStrength() >= 3" [class.s3]="pwStrength() === 3" [class.s4]="pwStrength() === 4"></span>
+                    <span class="pw-bar" [class.filled]="pwStrength() >= 4" [class.s4]="pwStrength() === 4"></span>
+                  </div>
+                  <span class="pw-label">{{ pwStrengthLabel() }}</span>
+                </div>
+              }
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="cpw">Passwort bestätigen</label>
+              <div class="field-input-wrap">
+                <i class="pi pi-lock field-icon"></i>
+                <input id="cpw" class="field-input"
+                       [type]="showConfirmPw() ? 'text' : 'password'"
+                       placeholder="Passwort wiederholen"
+                       [ngModel]="confirmPassword()" (ngModelChange)="confirmPassword.set($event)" />
+                <button class="field-eye" type="button" (click)="showConfirmPw.update(v => !v)" tabindex="-1">
+                  <i class="pi" [class.pi-eye]="!showConfirmPw()" [class.pi-eye-slash]="showConfirmPw()"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel-footer">
+            <button class="btn-primary" (click)="changePassword()" [disabled]="savingPw()">
+              @if (savingPw()) { <span class="spin"></span> Ändern… }
+              @else { <i class="pi pi-shield"></i> Passwort ändern }
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- ══ API Key ══ -->
+      @if (activeTab() === 'api') {
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-head-icon accent">
+              <i class="pi pi-key"></i>
+            </div>
+            <div class="panel-head-text">
+              <h2>Anonymer API-Key</h2>
+              <p>Nutze deinen Key, um FlowTrader-Daten anonym in externe Tools zu integrieren.</p>
+            </div>
+          </div>
+
+          <!-- Info box -->
+          <div class="info-box">
+            <i class="pi pi-info-circle info-box-icon"></i>
+            <div class="info-box-text">
+              <p><strong>Was ist ein anonymer API-Key?</strong></p>
+              <p>Der Key identifiziert dich, ohne deinen Namen oder deine E-Mail preiszugeben. Du kannst ihn jederzeit neu generieren — der alte wird dabei ungültig.</p>
+            </div>
+          </div>
+
+          @if (apiKey()) {
+            <!-- Key display -->
+            <div class="key-display">
+              <div class="key-display-header">
+                <span class="key-display-label">
+                  <i class="pi pi-circle-fill key-active-dot"></i>
+                  Aktiver Key
+                </span>
+                @if (formattedKeyDate) {
+                  <span class="key-date">Erstellt: {{ formattedKeyDate }}</span>
+                }
+              </div>
+              <div class="key-display-body">
+                <code class="key-value">{{ apiKeyVisible() ? apiKey() : maskedKey }}</code>
+                <div class="key-actions">
+                  <button class="key-btn" (click)="toggleKeyVisibility()" [title]="apiKeyVisible() ? 'Verbergen' : 'Anzeigen'">
+                    <i class="pi" [class.pi-eye]="!apiKeyVisible()" [class.pi-eye-slash]="apiKeyVisible()"></i>
+                  </button>
+                  <button class="key-btn" (click)="copyApiKey()" [title]="keyCopied() ? 'Kopiert!' : 'Kopieren'">
+                    <i class="pi" [class.pi-copy]="!keyCopied()" [class.pi-check]="keyCopied()" [style.color]="keyCopied() ? 'var(--green)' : ''"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          } @else {
+            <div class="key-empty">
+              <i class="pi pi-key key-empty-icon"></i>
+              <p>Noch kein API-Key generiert.</p>
+            </div>
+          }
+
+          <div class="panel-footer">
+            <button class="btn-primary" (click)="generateApiKey()" [disabled]="generatingKey()">
+              @if (generatingKey()) { <span class="spin"></span> Generieren… }
+              @else if (apiKey()) { <i class="pi pi-refresh"></i> Key neu generieren }
+              @else { <i class="pi pi-plus"></i> API-Key generieren }
+            </button>
+            @if (apiKey()) {
+              <span class="panel-footer-note">
+                <i class="pi pi-exclamation-triangle"></i>
+                Neu generieren macht den alten Key ungültig.
+              </span>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- ══ Abonnement ══ -->
+      @if (activeTab() === 'subscription') {
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-head-icon accent">
+              <i class="pi pi-credit-card"></i>
+            </div>
+            <div class="panel-head-text">
+              <h2>Abonnement</h2>
+              <p>Übersicht über deinen aktuellen Plan und Abrechnungszeitraum.</p>
+            </div>
+          </div>
+
+          @if (cancelSuccessMsg()) {
+            <div class="alert alert--ok"><i class="pi pi-check-circle"></i> {{ cancelSuccessMsg() }}</div>
+          }
+
+          <!-- Current plan card -->
+          <div class="plan-card">
+            <div class="plan-card-left">
+              <div class="plan-icon">
+                <i class="pi pi-star-fill"></i>
+              </div>
+              <div>
+                <p class="plan-name">Pro Plan</p>
+                <p class="plan-renewal">Nächste Verlängerung: <strong>01. Juli 2025</strong></p>
+              </div>
+            </div>
+            <div class="plan-price">
+              <span class="plan-amount">19 €</span>
+              <span class="plan-period">/ Monat</span>
+            </div>
+          </div>
+
+          <!-- Features list -->
+          <div class="plan-features">
+            <div class="plan-feature">
+              <i class="pi pi-check plan-feature-icon"></i>
+              <span>Unbegrenzte Trade-Dokumentation</span>
+            </div>
+            <div class="plan-feature">
+              <i class="pi pi-check plan-feature-icon"></i>
+              <span>Automatischer Trade-Import</span>
+            </div>
+            <div class="plan-feature">
+              <i class="pi pi-check plan-feature-icon"></i>
+              <span>Erweiterte Statistiken & Analyse</span>
+            </div>
+            <div class="plan-feature">
+              <i class="pi pi-check plan-feature-icon"></i>
+              <span>API-Key Zugang</span>
+            </div>
+          </div>
+
+          <!-- Cancel section -->
+          <div class="cancel-zone">
+            <div class="cancel-zone-header">
+              <div>
+                <h4>Abo kündigen</h4>
+                <p>Du kannst jederzeit kündigen. Der Zugriff bleibt bis zum Ende des bezahlten Zeitraums bestehen.</p>
+              </div>
+              @if (!showCancelForm() && !cancelSuccessMsg()) {
+                <button class="btn-cancel-toggle" (click)="showCancelForm.set(true)">
+                  Kündigen
+                </button>
+              }
+            </div>
+
+            @if (showCancelForm()) {
+              <div class="cancel-form">
+                @if (cancelErrorMsg()) {
+                  <div class="alert alert--err"><i class="pi pi-times-circle"></i> {{ cancelErrorMsg() }}</div>
+                }
+                <p class="cancel-form-label">Kündigungsgrund</p>
+                <div class="cancel-reasons">
+                  @for (reason of cancelReasons; track reason) {
+                    <button
+                      class="reason-chip"
+                      [class.selected]="cancelReason() === reason"
+                      (click)="cancelReason.set(reason)">
+                      {{ reason }}
+                    </button>
+                  }
+                </div>
+                <div class="cancel-form-actions">
+                  <button class="btn-ghost-sm" (click)="showCancelForm.set(false)">Abbrechen</button>
+                  <button class="btn-cancel-confirm" (click)="cancelSubscription()" [disabled]="cancellingPlan()">
+                    @if (cancellingPlan()) { <span class="spin"></span> Kündigen… }
+                    @else { <i class="pi pi-times"></i> Abo kündigen }
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+
+        </div>
+      }
+
+    </main>
+  </div>
+</div>

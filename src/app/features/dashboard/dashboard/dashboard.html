@@ -8,7 +8,9 @@
     </a>
     <div class="toolbar-actions">
       <button class="toolbar-icon-btn"><i class="pi pi-bell"></i></button>
-      <div class="toolbar-avatar"><i class="pi pi-user"></i></div>
+      <button class="toolbar-avatar" (click)="goToProfile()" title="Profil öffnen">
+        <i class="pi pi-user"></i>
+      </button>
     </div>
   </header>
 
@@ -74,7 +76,7 @@
 
       <!-- Footer -->
       <div class="sidebar-footer">
-        <div class="user-avatar">
+        <div class="user-avatar" (click)="goToProfile()" style="cursor:pointer" title="Profil öffnen">
           <i class="pi pi-user"></i>
         </div>
         <div class="user-info">
@@ -95,7 +97,6 @@
         @case('trades') {
           <app-trades-section></app-trades-section>
         }
-
       }
 
     </main>
