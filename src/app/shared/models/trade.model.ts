@@ -1,3 +1,5 @@
+import {TradeDirection} from '../enums/direction.enum';
+
 export type TradeResult = 'win' | 'loss' | 'breakeven';
 
 export interface Trade {
@@ -16,15 +18,16 @@ export interface Trade {
   createdAt: string;
 }
 
-export const MARKET_OPTIONS = ['Crypto', 'Forex', 'Stocks', 'Futures', 'Indices'];
 
-export const SETUP_OPTIONS = [
-  'Liquiditätszone',
-  'Pullback Entry',
-  'BIAS Reversal',
-  'Gap & Go',
-  'Range Break',
-  'Trendfortsetzung',
-  'News Play',
-  'Session Open',
-];
+export interface Trade {
+  id: string;
+  symbol: string;
+  direction: TradeDirection;
+  entry_price: number;
+  exit_price: number;
+  entry_time: string;
+  exit_time: string;
+  volume: number;
+  pnl_absolute: number;
+  account_id: string;
+}
