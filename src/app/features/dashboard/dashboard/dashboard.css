@@ -135,14 +135,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
+  border: none;
   border-radius: 50%;
   background: var(--accent-muted);
   color: var(--accent);
   cursor: pointer;
-
-  i { font-size: 15px; }
 }
 
 /* ── Sidebar Shell ───────────────────────────────────────── */
