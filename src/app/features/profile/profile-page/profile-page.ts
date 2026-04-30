@@ -114,16 +114,48 @@ export class ProfilePage implements OnInit {
     }
   }
 
+  // Ersetze generateApiKey() in profile-page.ts mit dieser Logik:
+
   async generateApiKey() {
     this.generatingKey.set(true);
+
+    // 1. Plaintext-Key generieren (nur einmal dem User zeigen)
     const array = new Uint8Array(20);
     crypto.getRandomValues(array);
     const hex = Array.from(array).map(b => b.toString(16).padStart(2, '0')).join('');
-    const key = `ft_live_${hex}`;
+    const plainKey = `ft_live_${hex}`;
+
+    // 2. SHA-256 Hash für die DB berechnen
+    const msgBuffer = new TextEncoder().encode(plainKey);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const keyHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
     const now = new Date().toISOString();
-    const { error } = await supabase.auth.updateUser({ data: { api_key: key, api_key_created_at: now } });
+
+    // 3. Alten Key löschen, neuen Hash speichern
+    const userId = this.auth.user()?.id;
+    if (!userId) { this.generatingKey.set(false); return; }
+
+    await supabase.from('api_keys').delete().eq('user_id', userId);
+
+    const { error } = await supabase.from('api_keys').insert({
+      user_id: userId,
+      key_hash: keyHash,
+    });
+
+    // 4. Plaintext NUR im User-Metadata für die Anzeige (optional — oder nur im State)
+    if (!error) {
+      await supabase.auth.updateUser({
+        data: { api_key_created_at: now }
+        // Wichtig: Den plainKey NICHT in Supabase speichern!
+      });
+      this.apiKey.set(plainKey);   // nur im RAM für einmalige Anzeige
+      this.apiKeyVisible.set(true);
+      this.keyGeneratedAt.set(now);
+    }
+
     this.generatingKey.set(false);
-    if (!error) { this.apiKey.set(key); this.apiKeyVisible.set(true); this.keyGeneratedAt.set(now); }
   }
 
   async copyApiKey() {

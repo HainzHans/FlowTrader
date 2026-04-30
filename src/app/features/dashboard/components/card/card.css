@@ -1,0 +1,53 @@
+/* Container extrem kompakt machen */
+.compact-card-wrapper {
+  max-width: 200px; /* Sehr schmal für Dashboards */
+  width: 100%;
+}
+
+/* PrimeNG Standard-Paddings überschreiben */
+:host ::ng-deep .p-card .p-card-body {
+  padding: 1rem; /* Reduziert von standardmäßigen 1.5rem+ */
+}
+
+:host ::ng-deep .p-card {
+  border-radius: 12px;
+  background: #080a0f;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem; /* Sehr kleine Lücke zwischen den Elementen */
+}
+
+/* Top Row */
+.top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #7e8497;
+  text-transform: uppercase;
+}
+
+.trend-icon {
+  font-size: 0.7rem;
+  font-weight: bold;
+}
+
+.trend-icon.profit { color: #16a34a; }
+.trend-icon.loss { color: #dc2626; }
+
+/* Main Amount */
+.main-amount {
+  font-size: 1.5rem; /* Deutlich kleiner als vorher */
+  font-weight: 800;
+  color: #16a34a;
+  line-height: 1.2;
+}
+

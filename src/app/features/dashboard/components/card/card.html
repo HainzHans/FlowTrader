@@ -1,0 +1,20 @@
+<div class="compact-card-wrapper">
+  <p-card>
+    <div class="card-content">
+
+      <!-- Top: Titel & Trend-Icon auf einer Linie -->
+      <div class="top-row">
+        <span class="title">Netto P&L ({{ currencyCode === 'EUR' ? '€' : '$' }})</span>
+        <div class="trend-icon" [ngClass]="statusTheme">
+          <i class="pi" [ngClass]="isPositive ? 'pi-arrow-up-right' : 'pi-arrow-down-right'"></i>
+        </div>
+      </div>
+
+      <!-- Main: P&L Amount -->
+      <div class="main-amount">
+        {{ totalPnL | number:'1.2-2' }}
+      </div>
+
+    </div>
+  </p-card>
+</div>

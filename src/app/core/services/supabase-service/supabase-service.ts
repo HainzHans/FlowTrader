@@ -16,7 +16,7 @@ export class SupabaseService {
   /** Fetch all trades for the current user, sorted newest first */
   async getAllTrades(): Promise<Trade[]> {
     const { data, error } = await this.supabase
-      .from('atas_trades')
+      .from('user_trades')
       .select('*')
       .order('entry_time', { ascending: false });
 
@@ -30,7 +30,7 @@ export class SupabaseService {
   /** Fetch trades filtered by account */
   async getTradesByAccount(accountId: string): Promise<Trade[]> {
     const { data, error } = await this.supabase
-      .from('atas_trades')
+      .from('user_trades')
       .select('*')
       .eq('account_id', accountId)
       .order('entry_time', { ascending: false });
@@ -45,7 +45,7 @@ export class SupabaseService {
   /** Fetch trades filtered by symbol */
   async getTradesBySymbol(symbol: string): Promise<Trade[]> {
     const { data, error } = await this.supabase
-      .from('atas_trades')
+      .from('user_trades')
       .select('*')
       .eq('symbol', symbol)
       .order('entry_time', { ascending: false });
@@ -60,7 +60,7 @@ export class SupabaseService {
   /** Fetch distinct account IDs available for the user */
   async getAccounts(): Promise<string[]> {
     const { data, error } = await this.supabase
-      .from('atas_trades')
+      .from('user_trades')
       .select('account_id');
 
     if (error) {
@@ -75,7 +75,7 @@ export class SupabaseService {
   /** Delete a trade by id */
   async deleteTrade(id: string): Promise<boolean> {
     const { error } = await this.supabase
-      .from('atas_trades')
+      .from('user_trades')
       .delete()
       .eq('id', id);
 

@@ -3,5 +3,10 @@
   [subTitle]="'Dokumentiere jeden Trade. Lerne aus jedem Setup.'"
 ></app-section-header>
 <div class="section-content">
-  <app-section-stats></app-section-stats>
+  <app-pnl-card
+    [totalPnL]="5000"
+    [bestTrade]="550"
+    [worstTrade]="200">
+
+  </app-pnl-card>
 </div>
