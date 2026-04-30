@@ -14,5 +14,9 @@ export class SectionHeader {
   title = input<string>('');
   subTitle = input<string>('');
 
+  primaryButtonText = input<string>('');
+  primaryButtonIcon = input<string>('');
+
+  iconButtonIcon = input<string>('');
 
 }

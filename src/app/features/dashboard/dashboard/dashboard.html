@@ -96,6 +96,12 @@
       @switch (activeKey()) {
         @case('trades') {
           <app-trades-section></app-trades-section>
+        }@case('setups') {
+          <app-setups-section></app-setups-section>
+        }@case('accounts') {
+          <app-accounts-section></app-accounts-section>
+        }@case('dashboard') {
+          <app-dashboard-section></app-dashboard-section>
         }
       }
 

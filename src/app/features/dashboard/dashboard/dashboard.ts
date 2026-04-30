@@ -2,6 +2,9 @@ import { Component, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { TradesSection } from '../sections/trades-section/trades-section';
 import { AuthService } from '../../../core/services/auth-service/auth-service';
+import {SetupsSection} from '../sections/setups-section/setups-section';
+import {AccountsSection} from '../sections/accounts-section/accounts-section';
+import {DashboardSection} from '../sections/dashboard-section/dashboard-section';
 
 export interface NavItem {
   icon:    string;
@@ -12,7 +15,7 @@ export interface NavItem {
 
 @Component({
   selector: 'app-dashboard',
-  imports: [TradesSection],
+  imports: [TradesSection, SetupsSection, AccountsSection, DashboardSection],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
@@ -21,12 +24,13 @@ export class Dashboard {
   private router      = inject(Router);
 
   isExpanded = signal(true);
-  activeKey  = signal<string>('admin-overview');
+  activeKey  = signal<string>('setups');
 
   userItems: NavItem[] = [
-    { icon: 'pi-chart-line',             label: 'Dashboard', key: 'dashboard' },
-    { icon: 'pi-verified',               label: 'Regeln',    key: 'rules'     },
-    { icon: 'pi-arrow-right-arrow-left', label: 'Trades',    key: 'trades'    },
+    { icon: 'pi-chart-line', label: 'Dashboard', key: 'dashboard' },
+    { icon: 'pi-wallet', label: 'Konten', key: 'accounts' },
+    { icon: 'pi-objects-column', label: 'Setups', key: 'setups' },
+    { icon: 'pi-arrow-right-arrow-left', label: 'Trades', key: 'trades' },
   ];
 
   learnItems: NavItem[] = [
@@ -34,7 +38,7 @@ export class Dashboard {
   ];
 
   adminItems: NavItem[] = [
-    { icon: 'pi-users',    label: 'Übersicht', key: 'admin-overview'     },
+    { icon: 'pi-users',    label: 'Übersicht', key: 'admin-overview' },
     { icon: 'pi-calendar', label: 'Termine',   key: 'admin-appointments' },
   ];
 

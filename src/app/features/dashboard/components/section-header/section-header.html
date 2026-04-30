@@ -7,13 +7,15 @@
     <div class="trades-header-right">
       <app-accent-button
         [isLarge]="false"
-        [buttonIcon]="'pi-plus'"
-        [buttonText]="'Trade hinzufügen'"
+        [buttonIcon]="primaryButtonIcon()"
+        [buttonText]="primaryButtonText()"
       ></app-accent-button>
-      <app-accent-button
-        [isLarge]="false"
-        [buttonIcon]="'pi-file-import'"
-      ></app-accent-button>
+      @if (iconButtonIcon()) {
+        <app-accent-button
+          [isLarge]="false"
+          [buttonIcon]="iconButtonIcon()"
+        ></app-accent-button>
+      }
     </div>
   </div>
 </div>
