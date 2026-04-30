@@ -20,7 +20,7 @@ export class TradesSection implements OnInit {
   constructor(private supabaseService: SupabaseService) { }
 
   async ngOnInit() {
-    this.daten = await this.supabaseService.getDaten();
+    this.daten = await this.supabaseService.getAllTrades();
     console.log(this.daten);
   }
 
