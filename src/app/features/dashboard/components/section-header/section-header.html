@@ -9,7 +9,16 @@
         [isLarge]="false"
         [buttonIcon]="primaryButtonIcon()"
         [buttonText]="primaryButtonText()"
+        (buttonClick)="primaryButtonClick.emit()"
       ></app-accent-button>
+      @if (secondaryButtonText()) {
+        <app-accent-button
+          [isLarge]="false"
+          [buttonIcon]="secondaryButtonIcon()"
+          [buttonText]="secondaryButtonText()"
+          (buttonClick)="secondaryButtonClick.emit()"
+        ></app-accent-button>
+      }
       @if (iconButtonIcon()) {
         <app-accent-button
           [isLarge]="false"

@@ -2,5 +2,264 @@
   [title]="'Setups & Regeln'"
   [subTitle]="'Erstelle und verwalte deine eigenen Setups und Regeln'"
   [primaryButtonIcon]="'pi-plus'"
-  [primaryButtonText]="'Setup erstellen'">
+  [primaryButtonText]="'Setup erstellen'"
+  (primaryButtonClick)="openNewSetup()"
+  [secondaryButtonIcon]="'pi-plus'"
+  [secondaryButtonText]="'Regel erstellen'"
+  (secondaryButtonClick)="openNewRule()">
 </app-section-header>
+<div class="section-content">
+  <div class="rs-root">
+    <!-- ── Tab Bar ── -->
+    <div class="rs-tabs">
+      <button class="rs-tab" [class.rs-tab--active]="activeTab() === 'rules'" (click)="activeTab.set('rules')">
+        <i class="pi pi-list"></i>
+        Regeln
+        <span class="rs-tab-count">{{ activeRulesCount() }}/{{ rules().length }}</span>
+      </button>
+      <button class="rs-tab" [class.rs-tab--active]="activeTab() === 'setups'" (click)="activeTab.set('setups')">
+        <i class="pi pi-bookmark"></i>
+        Setups
+        <span class="rs-tab-count">{{ setups().length }}</span>
+      </button>
+    </div>
+
+    <!-- ════════════════ RULES TAB ════════════════ -->
+    @if (activeTab() === 'rules') {
+      <div class="rs-content">
+        @if (rules().length === 0) {
+          <div class="rs-empty">
+            <i class="pi pi-list rs-empty-icon"></i>
+            <p>Noch keine Regeln erstellt.</p>
+            <button class="rs-btn-primary" (click)="openNewRule()">Erste Regel erstellen</button>
+          </div>
+        } @else {
+          <div class="rs-rules-grid">
+            @for (rule of rules(); track rule.id) {
+              <div class="rs-rule-card" [class.rs-rule-card--inactive]="!rule.active">
+                <div class="rs-rule-card-top">
+                  <div class="rs-rule-cat-badge" [style.background]="getCategoryMeta(rule.category).color + '22'" [style.color]="getCategoryMeta(rule.category).color" [style.borderColor]="getCategoryMeta(rule.category).color + '44'">
+                    <i class="pi {{ getCategoryMeta(rule.category).icon }}"></i>
+                    {{ getCategoryMeta(rule.category).label }}
+                  </div>
+                  <div class="rs-rule-card-actions">
+                    <button class="rs-icon-btn" (click)="openEditRule(rule)" title="Bearbeiten">
+                      <i class="pi pi-pencil"></i>
+                    </button>
+                    <button class="rs-icon-btn rs-icon-btn--delete" (click)="deleteRule(rule.id)" title="Löschen">
+                      <i class="pi pi-trash"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <h3 class="rs-rule-title">{{ rule.title }}</h3>
+                <p class="rs-rule-desc">{{ rule.description }}</p>
+
+                @if (rule.setups.length > 0) {
+                  <div class="rs-rule-setups">
+                    @for (sid of rule.setups; track sid) {
+                      @if (getSetupById(sid); as setup) {
+                        <span class="rs-setup-chip" [style.background]="setup.color + '22'" [style.color]="setup.color" [style.borderColor]="setup.color + '44'">
+                        <i class="pi pi-bookmark"></i>
+                          {{ setup.name }}
+                      </span>
+                      }
+                    }
+                  </div>
+                }
+
+                <div class="rs-rule-footer">
+                  <span class="rs-rule-date">{{ rule.createdAt }}</span>
+                  <label class="rs-toggle" [title]="rule.active ? 'Regel deaktivieren' : 'Regel aktivieren'">
+                    <input type="checkbox" [checked]="rule.active" (change)="toggleRule(rule.id)" />
+                    <span class="rs-toggle-track">
+                    <span class="rs-toggle-thumb"></span>
+                  </span>
+                    <span class="rs-toggle-label">{{ rule.active ? 'Aktiv' : 'Inaktiv' }}</span>
+                  </label>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    <!-- ════════════════ SETUPS TAB ════════════════ -->
+    @if (activeTab() === 'setups') {
+      <div class="rs-content">
+        @if (setups().length === 0) {
+          <div class="rs-empty">
+            <i class="pi pi-bookmark rs-empty-icon"></i>
+            <p>Noch keine Setups erstellt.</p>
+            <button class="rs-btn-primary" (click)="openNewSetup()">Erstes Setup erstellen</button>
+          </div>
+        } @else {
+          <div class="rs-setups-grid">
+            @for (setup of setups(); track setup.id) {
+              <div class="rs-setup-card">
+                <div class="rs-setup-card-accent" [style.background]="setup.color"></div>
+                <div class="rs-setup-card-body">
+                  <div class="rs-setup-card-top">
+                    <div class="rs-setup-icon" [style.background]="setup.color + '22'" [style.border]="'1px solid ' + setup.color + '44'">
+                      <i class="pi pi-bookmark" [style.color]="setup.color"></i>
+                    </div>
+                    <div class="rs-rule-card-actions">
+                      <button class="rs-icon-btn" (click)="openEditSetup(setup)" title="Bearbeiten">
+                        <i class="pi pi-pencil"></i>
+                      </button>
+                      <button class="rs-icon-btn rs-icon-btn--delete" (click)="deleteSetup(setup.id)" title="Löschen">
+                        <i class="pi pi-trash"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <h3 class="rs-setup-name">{{ setup.name }}</h3>
+                  <p class="rs-setup-desc">{{ setup.description }}</p>
+
+                  @if (setup.tags.length > 0) {
+                    <div class="rs-setup-tags">
+                      @for (tag of setup.tags; track tag) {
+                        <span class="rs-tag">{{ tag }}</span>
+                      }
+                    </div>
+                  }
+
+                  <!-- Rules using this setup -->
+                  <div class="rs-setup-rules-count">
+                    <i class="pi pi-list"></i>
+                    {{ rulerFilter() }} Regeln verknüpft
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+
+  </div>
+
+  <!-- ════════════════ RULE MODAL ════════════════ -->
+  @if (showRuleModal()) {
+    <div class="rs-modal-backdrop" (click)="showRuleModal.set(false)">
+      <div class="rs-modal" (click)="$event.stopPropagation()">
+        <div class="rs-modal-header">
+          <h2>{{ editingRule() ? 'Regel bearbeiten' : 'Neue Regel' }}</h2>
+          <button class="rs-modal-close" (click)="showRuleModal.set(false)">
+            <i class="pi pi-times"></i>
+          </button>
+        </div>
+
+        <div class="rs-modal-body">
+          <!-- Title -->
+          <div class="rs-field">
+            <label class="rs-field-label">Titel *</label>
+            <input class="rs-input" type="text" placeholder="z.B. Mindestens 1:2 R:R" [ngModel]="ruleForm().title" (ngModelChange)="ruleUpdateTitle($event)" />
+          </div>
+
+          <!-- Description -->
+          <div class="rs-field">
+            <label class="rs-field-label">Beschreibung</label>
+            <textarea class="rs-input rs-textarea" placeholder="Genauere Beschreibung der Regel..." rows="3" [ngModel]="ruleForm().description" (ngModelChange)="ruleUpdateDesc($event)"></textarea>
+          </div>
+
+          <!-- Category -->
+          <div class="rs-field">
+            <label class="rs-field-label">Kategorie</label>
+            <div class="rs-cat-grid">
+              @for (cat of categories; track cat.value) {
+                <button class="rs-cat-btn" [class.rs-cat-btn--selected]="ruleForm().category === cat.value" [style.borderColor]="ruleForm().category === cat.value ? cat.color + '88' : ''" [style.background]="ruleForm().category === cat.value ? cat.color + '18' : ''" (click)="ruleUpdateCategory(cat.value)">
+                  <i class="pi {{ cat.icon }}" [style.color]="cat.color"></i>
+                  <span>{{ cat.label }}</span>
+                </button>
+              }
+            </div>
+          </div>
+
+          <!-- Setups -->
+          @if (setups().length > 0) {
+            <div class="rs-field">
+              <label class="rs-field-label">Verknüpfte Setups</label>
+              <div class="rs-setup-select-grid">
+                @for (setup of setups(); track setup.id) {
+                  <button class="rs-setup-select-btn" [class.rs-setup-select-btn--selected]="isSetupSelected(setup.id)" [style.borderColor]="isSetupSelected(setup.id) ? setup.color + '88' : ''" [style.background]="isSetupSelected(setup.id) ? setup.color + '18' : ''" (click)="toggleSetupInRule(setup.id)">
+                    <span class="rs-setup-select-dot" [style.background]="setup.color"></span>
+                    {{ setup.name }}
+                    @if (isSetupSelected(setup.id)) {
+                      <i class="pi pi-check" [style.color]="setup.color"></i>
+                    }
+                  </button>
+                }
+              </div>
+            </div>
+          }
+        </div>
+
+        <div class="rs-modal-footer">
+          <button class="rs-btn-ghost" (click)="showRuleModal.set(false)">Abbrechen</button>
+          <button class="rs-btn-primary" (click)="saveRule()">
+            <i class="pi pi-check"></i>
+            {{ editingRule() ? 'Speichern' : 'Erstellen' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ════════════════ SETUP MODAL ════════════════ -->
+  @if (showSetupModal()) {
+    <div class="rs-modal-backdrop" (click)="showSetupModal.set(false)">
+      <div class="rs-modal" (click)="$event.stopPropagation()">
+        <div class="rs-modal-header">
+          <h2>{{ editingSetup() ? 'Setup bearbeiten' : 'Neues Setup' }}</h2>
+          <button class="rs-modal-close" (click)="showSetupModal.set(false)">
+            <i class="pi pi-times"></i>
+          </button>
+        </div>
+
+        <div class="rs-modal-body">
+          <!-- Name -->
+          <div class="rs-field">
+            <label class="rs-field-label">Name *</label>
+            <input class="rs-input" type="text" placeholder="z.B. Liquiditätszone" [ngModel]="setupForm().name" (ngModelChange)="setupUpdateName($event)" />
+          </div>
+
+          <!-- Description -->
+          <div class="rs-field">
+            <label class="rs-field-label">Beschreibung</label>
+            <textarea class="rs-input rs-textarea" placeholder="Wann und wie verwendest du dieses Setup?" rows="3" [ngModel]="setupForm().description" (ngModelChange)="setupUpdateDesc($event)"></textarea>
+          </div>
+
+          <!-- Tags -->
+          <div class="rs-field">
+            <label class="rs-field-label">Tags <span class="rs-field-hint">(kommagetrennt)</span></label>
+            <input class="rs-input" type="text" placeholder="z.B. SMC, Institutional, H4" [ngModel]="setupForm().tags" (ngModelChange)="setupUpdateTags($event)" />
+          </div>
+
+          <!-- Color -->
+          <div class="rs-field">
+            <label class="rs-field-label">Farbe</label>
+            <div class="rs-color-grid">
+              @for (color of setupColors; track color) {
+                <button class="rs-color-btn" [style.background]="color" [class.rs-color-btn--selected]="setupForm().color === color" (click)="setupUpdateColor(color)">
+                  @if (setupForm().color === color) {
+                    <i class="pi pi-check" style="color:#fff; font-size:12px;"></i>
+                  }
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="rs-modal-footer">
+          <button class="rs-btn-ghost" (click)="showSetupModal.set(false)">Abbrechen</button>
+          <button class="rs-btn-primary" (click)="saveSetup()">
+            <i class="pi pi-check"></i>
+            {{ editingSetup() ? 'Speichern' : 'Erstellen' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

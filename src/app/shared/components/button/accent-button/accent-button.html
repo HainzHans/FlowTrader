@@ -1,8 +1,8 @@
 <button class="btn btn--accent"
         [class.btn--lg]="isLarge()"
         [class.btn--sm]="!isLarge()"
-        [class.btn--icon-only]="buttonIcon() && !buttonText()">
-
+        [class.btn--icon-only]="buttonIcon() && !buttonText()"
+        (click)="buttonClick.emit()">
   <div class="btn__content">
     @if (buttonIcon()) {
       <i class="pi {{ buttonIcon() }} btn__icon"></i>

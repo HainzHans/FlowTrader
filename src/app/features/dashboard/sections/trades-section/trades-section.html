@@ -6,5 +6,9 @@
   [iconButtonIcon]="'pi-file-import'"
 ></app-section-header>
 <div class="section-content">
-
+  @for (trade of trades(); track trade.id) {
+    <app-user-trade-card
+      [trade]="trade"
+    ></app-user-trade-card>
+  }
 </div>

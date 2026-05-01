@@ -2,6 +2,208 @@
   [title]="'Konten'"
   [subTitle]="'Erstelle und verwalte deine Konten'"
   [primaryButtonIcon]="'pi-plus'"
-  [primaryButtonText]="'Konto erstellen'">
+  [primaryButtonText]="'Konto erstellen'"
+  (primaryButtonClick)="openNew()">
 </app-section-header>
+<div class="section-content">
+  <div class="ac-root">
 
+    <!-- ── Empty State ── -->
+    @if (accounts().length === 0) {
+      <div class="ac-empty">
+        <div class="ac-empty-icon-wrap">
+          <i class="pi pi-briefcase"></i>
+        </div>
+        <h3>Noch kein Konto angelegt</h3>
+        <p>Erstelle dein erstes Trading-Konto, um deine Performance zu tracken.</p>
+        <button class="ac-btn-primary" (click)="openNew()">
+          <i class="pi pi-plus"></i>
+          Konto erstellen
+        </button>
+      </div>
+    }
+
+    <!-- ── Accounts Grid ── -->
+    @if (accounts().length > 0) {
+      <div class="ac-grid">
+        @for (account of accounts(); track account.id) {
+          <div class="ac-card">
+
+            <!-- Accent bar -->
+            <div class="ac-card-bar" [style.background]="account.color"></div>
+
+            <!-- Header -->
+            <div class="ac-card-header">
+              <div class="ac-card-icon" [style.background]="account.color + '22'" [style.borderColor]="account.color + '44'">
+                <i class="pi pi-briefcase" [style.color]="account.color"></i>
+              </div>
+              <div class="ac-card-title-wrap">
+                <h3 class="ac-card-name">{{ account.name }}</h3>
+                @if (account.broker) {
+                  <p class="ac-card-broker">{{ account.broker }}</p>
+                }
+              </div>
+              <div class="ac-type-badge ac-type-badge--{{ account.type }}">
+                <i class="pi {{ getTypeMeta(account.type).icon }}"></i>
+                {{ getTypeMeta(account.type).label }}
+              </div>
+            </div>
+
+            <!-- Balance -->
+            <div class="ac-card-balance">
+              <div class="ac-balance-current">
+                <span class="ac-balance-label">Aktuell</span>
+                <span class="ac-balance-value">{{ formatCurrency(account.currentBalance, account.currency) }}</span>
+              </div>
+              <div class="ac-balance-start">
+                <span class="ac-balance-label">Start</span>
+                <span class="ac-balance-start-val">{{ formatCurrency(account.startBalance, account.currency) }}</span>
+              </div>
+            </div>
+
+            <!-- P&L -->
+            <div class="ac-card-pnl" [class.ac-pos]="getPnl(account) > 0" [class.ac-neg]="getPnl(account) < 0" [class.ac-neutral]="getPnl(account) === 0">
+              <div class="ac-pnl-bar-wrap">
+                <div class="ac-pnl-bar" [style.width]="Math.min(Math.abs(getPnlPercent(account)), 100) + '%'" [style.background]="getPnl(account) >= 0 ? '#22c55e' : '#ef4444'"></div>
+              </div>
+              <div class="ac-pnl-row">
+                <span class="ac-pnl-label">P&L</span>
+                <span class="ac-pnl-value">
+                {{ getPnl(account) > 0 ? '+' : '' }}{{ formatCurrency(getPnl(account), account.currency) }}
+                  ({{ getPnlPercent(account) > 0 ? '+' : '' }}{{ getPnlPercent(account).toFixed(2) }}%)
+              </span>
+              </div>
+            </div>
+
+            <!-- Meta row -->
+            <div class="ac-card-meta">
+            <span class="ac-meta-pill">
+              <i class="pi pi-calendar"></i>
+              {{ account.createdAt }}
+            </span>
+              <span class="ac-meta-pill">
+              <i class="pi pi-dollar-sign" style="font-size:10px"></i>
+                {{ account.currency }}
+            </span>
+            </div>
+
+            <!-- Actions -->
+            <div class="ac-card-actions">
+              <button class="ac-action-edit" (click)="openEdit(account)">
+                <i class="pi pi-pencil"></i>
+                Bearbeiten
+              </button>
+              <button class="ac-action-delete" (click)="confirmDelete(account.id)" aria-label="Konto löschen">
+                <i class="pi pi-trash"></i>
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+  </div>
+
+  <!-- ════════════════ ACCOUNT MODAL ════════════════ -->
+  @if (showModal()) {
+    <div class="ac-modal-backdrop" (click)="showModal.set(false)">
+      <div class="ac-modal" (click)="$event.stopPropagation()">
+
+        <div class="ac-modal-header">
+          <h2>{{ editingAccount() ? 'Konto bearbeiten' : 'Neues Konto' }}</h2>
+          <button class="ac-modal-close" (click)="showModal.set(false)">
+            <i class="pi pi-times"></i>
+          </button>
+        </div>
+
+        <div class="ac-modal-body">
+
+          <!-- Name -->
+          <div class="ac-field">
+            <label class="ac-field-label">Kontoname *</label>
+            <input class="ac-input" type="text" placeholder="z.B. Haupt-Konto" [ngModel]="accountForm().name" (ngModelChange)="accountUpdateName($event)" />
+          </div>
+
+          <!-- Broker -->
+          <div class="ac-field">
+            <label class="ac-field-label">Broker / Plattform</label>
+            <input class="ac-input" type="text" placeholder="z.B. FTMO, Interactive Brokers, MT4..." [ngModel]="accountForm().broker" (ngModelChange)="accountUpdateBroker($event)" />
+          </div>
+
+          <!-- Type -->
+          <div class="ac-field">
+            <label class="ac-field-label">Kontotyp</label>
+            <div class="ac-type-grid">
+              @for (type of accountTypes; track type.value) {
+                <button class="ac-type-btn" [class.ac-type-btn--selected]="accountForm().type === type.value" [style.borderColor]="accountForm().type === type.value ? type.color + '88' : ''" [style.background]="accountForm().type === type.value ? type.color + '18' : ''" (click)="accountUpdateType(type.value)">
+                  <i class="pi {{ type.icon }}" [style.color]="type.color"></i>
+                  <span class="ac-type-btn-label">{{ type.label }}</span>
+                  <span class="ac-type-btn-desc">{{ type.desc }}</span>
+                </button>
+              }
+            </div>
+          </div>
+
+          <!-- Currency & Start Balance -->
+          <div class="ac-field-row">
+            <div class="ac-field">
+              <label class="ac-field-label">Währung</label>
+              <select class="ac-input ac-select" [ngModel]="accountForm().currency" (ngModelChange)="accountUpdateCurrency($event)">
+                @for (c of currencies; track c) {
+                  <option [value]="c">{{ c }}</option>
+                }
+              </select>
+            </div>
+            <div class="ac-field ac-field--flex">
+              <label class="ac-field-label">Startguthaben *</label>
+              <input class="ac-input" type="number" placeholder="10000" min="0" step="100" [ngModel]="accountForm().startBalance" (ngModelChange)="accountUpdateStartBalance($event)" />
+            </div>
+          </div>
+
+          <!-- Color -->
+          <div class="ac-field">
+            <label class="ac-field-label">Farbe</label>
+            <div class="ac-color-grid">
+              @for (color of colors; track color) {
+                <button class="ac-color-btn" [style.background]="color" [class.ac-color-btn--selected]="accountForm().color === color" (click)="accountUpdateColor(color)">
+                  @if (accountForm().color === color) {
+                    <i class="pi pi-check" style="color:#fff; font-size:11px;"></i>
+                  }
+                </button>
+              }
+            </div>
+          </div>
+
+        </div>
+
+        <div class="ac-modal-footer">
+          <button class="ac-btn-ghost" (click)="showModal.set(false)">Abbrechen</button>
+          <button class="ac-btn-primary" (click)="save()">
+            <i class="pi pi-check"></i>
+            {{ editingAccount() ? 'Speichern' : 'Konto erstellen' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ════════════════ DELETE CONFIRM ════════════════ -->
+  @if (deleteConfirmId()) {
+    <div class="ac-modal-backdrop" (click)="deleteConfirmId.set(null)">
+      <div class="ac-confirm-dialog" (click)="$event.stopPropagation()">
+        <div class="ac-confirm-icon">
+          <i class="pi pi-exclamation-triangle"></i>
+        </div>
+        <h3>Konto löschen?</h3>
+        <p>Diese Aktion kann nicht rückgängig gemacht werden. Alle zugehörigen Daten gehen verloren.</p>
+        <div class="ac-confirm-actions">
+          <button class="ac-btn-ghost" (click)="deleteConfirmId.set(null)">Abbrechen</button>
+          <button class="ac-btn-delete" (click)="deleteAccount()">
+            <i class="pi pi-trash"></i>
+            Löschen
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

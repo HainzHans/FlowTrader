@@ -1,4 +1,4 @@
-import {Component, input} from '@angular/core';
+import {Component, input, output} from '@angular/core';
 import {AccentButton} from '../../../../shared/components/button/accent-button/accent-button';
 
 @Component({
@@ -16,6 +16,11 @@ export class SectionHeader {
 
   primaryButtonText = input<string>('');
   primaryButtonIcon = input<string>('');
+  primaryButtonClick = output<void>();
+
+  secondaryButtonText = input<string>('');
+  secondaryButtonIcon = input<string>('');
+  secondaryButtonClick = output<void>();
 
   iconButtonIcon = input<string>('');
 

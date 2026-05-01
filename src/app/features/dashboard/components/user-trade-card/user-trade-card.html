@@ -1,0 +1,109 @@
+<article class="trade-card" [attr.data-result]="result" [attr.data-direction]="trade().direction">
+
+  <!-- ── Sparkline Visual ── -->
+  <div class="card-visual">
+    <svg viewBox="0 0 210 80" preserveAspectRatio="none" class="sparkline-svg">
+      <defs>
+        <linearGradient [id]="gradientId" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" [attr.stop-color]="gradientColor" stop-opacity="0.3"/>
+          <stop offset="100%" [attr.stop-color]="gradientColor" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <path [attr.d]="sparklineFill" [attr.fill]="'url(#' + gradientId + ')'" />
+      <path [attr.d]="sparklinePath" fill="none" [attr.stroke]="strokeColor"
+            stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+
+    <!-- Overlays -->
+    <div class="card-overlays">
+      <div class="symbol-wrap">
+        <span class="symbol-chip">{{ trade().symbol }}</span>
+        <span class="direction-chip" [attr.data-dir]="trade().direction">
+          <span class="dir-arrow">{{ trade().direction === 'Long' ? '▲' : '▼' }}</span>
+          {{ trade().direction }}
+        </span>
+      </div>
+      <span class="result-chip" [attr.data-result]="result">
+        {{ result === 'win' ? 'WIN' : result === 'loss' ? 'LOSS' : 'BE' }}
+      </span>
+    </div>
+
+    <!-- Import Badge -->
+    @if (trade().is_import) {
+      <div class="import-badge" title="Automatisch importiert via ATAS">
+        <i class="pi pi-bolt"></i>
+        Import
+      </div>
+    }
+
+  </div>
+
+  <!-- ── Body ── -->
+  <div class="card-body">
+
+    <!-- PnL Hero Row -->
+    <div class="pnl-row">
+      <div class="pnl-block">
+        <span class="pnl-label">P&L Brutto</span>
+        <span class="pnl-value" [attr.data-result]="result">{{ pnlFormatted }}</span>
+      </div>
+      <div class="pnl-divider"></div>
+      <div class="pnl-block">
+        <span class="pnl-label">P&L Netto</span>
+        <span class="pnl-value pnl-value--net" [attr.data-result]="result">{{ netPnlFormatted }}</span>
+      </div>
+    </div>
+
+    <!-- Price Info Grid -->
+    <div class="price-grid">
+      <div class="price-cell">
+        <span class="price-label">Entry</span>
+        <span class="price-value">{{ entryPriceFormatted }}</span>
+        <span class="price-sub">{{ entryTimeFormatted }}</span>
+      </div>
+      <div class="price-arrow">
+        <div class="price-diff" [attr.data-result]="result">
+          {{ priceDiffFormatted }}
+        </div>
+        <svg width="32" height="10" viewBox="0 0 32 10">
+          <line x1="0" y1="5" x2="28" y2="5" [attr.stroke]="strokeColor" stroke-width="1.5"/>
+          <polyline points="22,1 30,5 22,9" [attr.stroke]="strokeColor" stroke-width="1.5" fill="none"/>
+        </svg>
+      </div>
+      <div class="price-cell price-cell--right">
+        <span class="price-label">Exit</span>
+        <span class="price-value">{{ exitPriceFormatted }}</span>
+        <span class="price-sub">{{ exitTimeFormatted }}</span>
+      </div>
+    </div>
+
+    <!-- Meta Pills -->
+    <div class="meta-row">
+      <span class="meta-pill">
+        <i class="pi pi-clock"></i>
+        {{ durationFormatted }}
+      </span>
+      <span class="meta-pill">
+        <i class="pi pi-chart-bar"></i>
+        Vol {{ trade().volume }}
+      </span>
+      <span class="meta-pill" *ngIf="trade().commission">
+        <i class="pi pi-minus-circle"></i>
+        {{ commissionFormatted }}
+      </span>
+      <span class="meta-pill meta-pill--account">
+        <i class="pi pi-server"></i>
+        {{ trade().account_id }}
+      </span>
+    </div>
+
+  </div>
+
+  <!-- ── Actions ── -->
+  <div class="card-actions">
+    <button class="action-delete" (click)="onDelete.emit(trade().id)" aria-label="Löschen" title="Trade löschen">
+      <i class="pi pi-trash"></i>
+    </button>
+  </div>
+
+</article>

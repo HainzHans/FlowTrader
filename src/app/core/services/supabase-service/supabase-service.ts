@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { environment } from '../../../../environments/env';
-import {Trade} from '../../../shared/models/trade.model';
+import {UserTrade} from '../../../shared/models/trade.model';
 
 @Injectable({ providedIn: 'root' })
 export class SupabaseService {
@@ -14,7 +14,7 @@ export class SupabaseService {
   // ── Trades ────────────────────────────────────────────────
 
   /** Fetch all trades for the current user, sorted newest first */
-  async getAllTrades(): Promise<Trade[]> {
+  async getAllTrades(): Promise<UserTrade[]> {
     const { data, error } = await this.supabase
       .from('user_trades')
       .select('*')
@@ -24,11 +24,11 @@ export class SupabaseService {
       console.error('[SupabaseService] getAllTrades:', error.message);
       return [];
     }
-    return (data ?? []) as Trade[];
+    return (data ?? []) as UserTrade[];
   }
 
   /** Fetch trades filtered by account */
-  async getTradesByAccount(accountId: string): Promise<Trade[]> {
+  async getTradesByAccount(accountId: string): Promise<UserTrade[]> {
     const { data, error } = await this.supabase
       .from('user_trades')
       .select('*')
@@ -39,11 +39,11 @@ export class SupabaseService {
       console.error('[SupabaseService] getTradesByAccount:', error.message);
       return [];
     }
-    return (data ?? []) as Trade[];
+    return (data ?? []) as UserTrade[];
   }
 
   /** Fetch trades filtered by symbol */
-  async getTradesBySymbol(symbol: string): Promise<Trade[]> {
+  async getTradesBySymbol(symbol: string): Promise<UserTrade[]> {
     const { data, error } = await this.supabase
       .from('user_trades')
       .select('*')
@@ -54,7 +54,7 @@ export class SupabaseService {
       console.error('[SupabaseService] getTradesBySymbol:', error.message);
       return [];
     }
-    return (data ?? []) as Trade[];
+    return (data ?? []) as UserTrade[];
   }
 
   /** Fetch distinct account IDs available for the user */

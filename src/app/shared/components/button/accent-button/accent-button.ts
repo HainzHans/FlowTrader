@@ -1,4 +1,4 @@
-import {Component, input, signal} from '@angular/core';
+import {Component, input, output, signal} from '@angular/core';
 
 @Component({
   selector: 'app-accent-button',
@@ -10,6 +10,7 @@ export class AccentButton {
 
   buttonText = input<string>('');
   buttonIcon = input<string>('');
+  buttonClick = output<void>();
   isLarge = input.required<boolean>()
 
 }
