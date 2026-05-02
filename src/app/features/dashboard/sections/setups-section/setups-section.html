@@ -1,265 +1,510 @@
+<!-- ══ Section Header ══ -->
 <app-section-header
   [title]="'Setups & Regeln'"
-  [subTitle]="'Erstelle und verwalte deine eigenen Setups und Regeln'"
+  [subTitle]="'Definiere deine Trading-Setups und Regeln'"
   [primaryButtonIcon]="'pi-plus'"
-  [primaryButtonText]="'Setup erstellen'"
-  (primaryButtonClick)="openNewSetup()"
-  [secondaryButtonIcon]="'pi-plus'"
-  [secondaryButtonText]="'Regel erstellen'"
-  (secondaryButtonClick)="openNewRule()">
-</app-section-header>
-<div class="section-content">
-  <div class="rs-root">
-    <!-- ── Tab Bar ── -->
-    <div class="rs-tabs">
-      <button class="rs-tab" [class.rs-tab--active]="activeTab() === 'rules'" (click)="activeTab.set('rules')">
-        <i class="pi pi-list"></i>
-        Regeln
-        <span class="rs-tab-count">{{ activeRulesCount() }}/{{ rules().length }}</span>
-      </button>
-      <button class="rs-tab" [class.rs-tab--active]="activeTab() === 'setups'" (click)="activeTab.set('setups')">
-        <i class="pi pi-bookmark"></i>
-        Setups
-        <span class="rs-tab-count">{{ setups().length }}</span>
-      </button>
-    </div>
+  [primaryButtonText]="mainTab() === 'setups' ? 'Setup erstellen' : 'Globale Regel'"
+  (primaryButtonClick)="mainTab() === 'setups' ? openNewSetup() : openNewRule(null)"
+></app-section-header>
 
-    <!-- ════════════════ RULES TAB ════════════════ -->
-    @if (activeTab() === 'rules') {
-      <div class="rs-content">
-        @if (rules().length === 0) {
-          <div class="rs-empty">
-            <i class="pi pi-list rs-empty-icon"></i>
-            <p>Noch keine Regeln erstellt.</p>
-            <button class="rs-btn-primary" (click)="openNewRule()">Erste Regel erstellen</button>
+<div class="section-content">
+  <div class="ss-root">
+
+    <!-- ══ Loading ══ -->
+    @if (loading()) {
+      <div class="ss-loading">
+        <div class="ss-spinner"></div>
+        <p>Lade Setups & Regeln…</p>
+      </div>
+    }
+
+    <!-- ══ Error ══ -->
+    @if (error() && !loading()) {
+      <div class="ss-error">
+        <i class="pi pi-exclamation-triangle"></i>
+        <p>{{ error() }}</p>
+        <button class="ss-btn-ghost" (click)="ngOnInit()">Erneut versuchen</button>
+      </div>
+    }
+
+    <!-- ══ Main Content ══ -->
+    @if (!loading() && !error()) {
+
+      <!-- Tab Bar -->
+      <div class="ss-tab-bar">
+        <button class="ss-tab" [class.ss-tab--active]="mainTab() === 'setups'"
+                (click)="mainTab.set('setups')">
+          <i class="pi pi-bookmark"></i>
+          Setups
+          <span class="ss-tab-badge">{{ setups().length }}</span>
+        </button>
+        <button class="ss-tab" [class.ss-tab--active]="mainTab() === 'global-rules'"
+                (click)="mainTab.set('global-rules')">
+          <i class="pi pi-globe"></i>
+          Globale Regeln
+          <span class="ss-tab-badge" [class.ss-tab-badge--active]="activeGlobalCount() > 0">
+            {{ activeGlobalCount() }}/{{ globalRules().length }}
+          </span>
+        </button>
+      </div>
+
+      <!-- ════════ SETUPS TAB ════════ -->
+      @if (mainTab() === 'setups') {
+
+        @if (setups().length === 0) {
+          <div class="ss-empty">
+            <div class="ss-empty-icon">
+              <i class="pi pi-bookmark"></i>
+            </div>
+            <h3>Noch keine Setups</h3>
+            <p>Erstelle dein erstes Trading-Setup und füge spezifische Regeln hinzu.</p>
+            <button class="ss-btn-primary" (click)="openNewSetup()">
+              <i class="pi pi-plus"></i>
+              Setup erstellen
+            </button>
           </div>
-        } @else {
-          <div class="rs-rules-grid">
-            @for (rule of rules(); track rule.id) {
-              <div class="rs-rule-card" [class.rs-rule-card--inactive]="!rule.active">
-                <div class="rs-rule-card-top">
-                  <div class="rs-rule-cat-badge" [style.background]="getCategoryMeta(rule.category).color + '22'" [style.color]="getCategoryMeta(rule.category).color" [style.borderColor]="getCategoryMeta(rule.category).color + '44'">
+        }
+
+        @if (setups().length > 0) {
+          <div class="ss-setups-list">
+            @for (setup of setups(); track setup.id) {
+
+              <!-- Setup Row -->
+              <div class="ss-setup-item" [class.ss-setup-item--open]="expandedSetupId() === setup.id">
+
+                <!-- Setup Header (clickable to expand) -->
+                <div class="ss-setup-header" (click)="toggleSetupExpand(setup.id)">
+                  <div class="ss-setup-accent" [style.background]="setup.color"></div>
+
+                  <div class="ss-setup-icon" [style.background]="setup.color + '22'"
+                       [style.border-color]="setup.color + '55'">
+                    <i class="pi pi-bookmark" [style.color]="setup.color"></i>
+                  </div>
+
+                  <div class="ss-setup-info">
+                    <div class="ss-setup-title-row">
+                      <h3 class="ss-setup-name">{{ setup.name }}</h3>
+                      @if (setup.tags.length > 0) {
+                        <div class="ss-setup-tags">
+                          @for (tag of setup.tags.slice(0,3); track tag) {
+                            <span class="ss-tag">{{ tag }}</span>
+                          }
+                          @if (setup.tags.length > 3) {
+                            <span class="ss-tag ss-tag--more">+{{ setup.tags.length - 3 }}</span>
+                          }
+                        </div>
+                      }
+                    </div>
+                    @if (setup.description) {
+                      <p class="ss-setup-desc">{{ setup.description }}</p>
+                    }
+                    <div class="ss-setup-meta">
+                      <span class="ss-meta-pill">
+                        <i class="pi pi-list"></i>
+                        {{ rulesForSetup(setup.id).length }} Regeln
+                      </span>
+                      <span class="ss-meta-pill">
+                        <i class="pi pi-check-circle"></i>
+                        {{ rulesForSetup(setup.id).filter(r => r.active).length }} aktiv
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="ss-setup-actions">
+                    <button class="ss-icon-btn" title="Regel hinzufügen"
+                            (click)="$event.stopPropagation(); openNewRule(setup.id)">
+                      <i class="pi pi-plus"></i>
+                    </button>
+                    <button class="ss-icon-btn" title="Setup bearbeiten"
+                            (click)="openEditSetup(setup, $event)">
+                      <i class="pi pi-pencil"></i>
+                    </button>
+                    <button class="ss-icon-btn ss-icon-btn--delete" title="Setup löschen"
+                            (click)="confirmDeleteSetup(setup.id, $event)">
+                      <i class="pi pi-trash"></i>
+                    </button>
+                    <div class="ss-expand-icon" [class.ss-expand-icon--open]="expandedSetupId() === setup.id">
+                      <i class="pi pi-chevron-down"></i>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Rules Panel (expanded) -->
+                @if (expandedSetupId() === setup.id) {
+                  <div class="ss-rules-panel">
+
+                    @if (rulesForSetup(setup.id).length === 0) {
+                      <div class="ss-rules-empty">
+                        <i class="pi pi-list"></i>
+                        <span>Noch keine Regeln — </span>
+                        <button class="ss-inline-btn" (click)="openNewRule(setup.id)">
+                          Erste Regel hinzufügen
+                        </button>
+                      </div>
+                    }
+
+                    @if (rulesForSetup(setup.id).length > 0) {
+                      <div class="ss-rules-grid">
+                        @for (rule of rulesForSetup(setup.id); track rule.id) {
+                          <div class="ss-rule-card" [class.ss-rule-card--inactive]="!rule.active">
+
+                            <div class="ss-rule-top">
+                              <div class="ss-rule-cat"
+                                   [style.background]="getCategoryMeta(rule.category).color + '22'"
+                                   [style.color]="getCategoryMeta(rule.category).color"
+                                   [style.border-color]="getCategoryMeta(rule.category).color + '44'">
+                                <i class="pi {{ getCategoryMeta(rule.category).icon }}"></i>
+                                {{ getCategoryMeta(rule.category).label }}
+                              </div>
+                              <div class="ss-rule-actions">
+                                <button class="ss-icon-btn ss-icon-btn--sm"
+                                        (click)="openEditRule(rule, $event)">
+                                  <i class="pi pi-pencil"></i>
+                                </button>
+                                <button class="ss-icon-btn ss-icon-btn--sm ss-icon-btn--delete"
+                                        (click)="confirmDeleteRule(rule.id, $event)">
+                                  <i class="pi pi-trash"></i>
+                                </button>
+                              </div>
+                            </div>
+
+                            <h4 class="ss-rule-title">{{ rule.title }}</h4>
+                            @if (rule.description) {
+                              <p class="ss-rule-desc">{{ rule.description }}</p>
+                            }
+
+                            <div class="ss-rule-footer">
+                              <label class="ss-toggle">
+                                <input type="checkbox" [checked]="rule.active"
+                                       (change)="toggleRule(rule.id)" />
+                                <span class="ss-toggle-track">
+                                  <span class="ss-toggle-thumb"></span>
+                                </span>
+                                <span class="ss-toggle-label">{{ rule.active ? 'Aktiv' : 'Inaktiv' }}</span>
+                              </label>
+                            </div>
+
+                          </div>
+                        }
+
+                        <!-- Add rule tile -->
+                        <button class="ss-rule-add-tile" (click)="openNewRule(setup.id)">
+                          <i class="pi pi-plus"></i>
+                          <span>Regel hinzufügen</span>
+                        </button>
+                      </div>
+                    }
+
+                  </div>
+                }
+
+              </div>
+
+            }
+          </div>
+        }
+
+      }
+
+      <!-- ════════ GLOBAL RULES TAB ════════ -->
+      @if (mainTab() === 'global-rules') {
+
+        <div class="ss-global-info">
+          <i class="pi pi-info-circle"></i>
+          <p>Globale Regeln gelten für <strong>alle Setups</strong> und werden bei jedem Trade berücksichtigt.</p>
+        </div>
+
+        @if (globalRules().length === 0) {
+          <div class="ss-empty">
+            <div class="ss-empty-icon ss-empty-icon--globe">
+              <i class="pi pi-globe"></i>
+            </div>
+            <h3>Keine globalen Regeln</h3>
+            <p>Globale Regeln gelten für alle deine Setups — z.B. Risikomanagement oder Mindset-Regeln.</p>
+            <button class="ss-btn-primary" (click)="openNewRule(null)">
+              <i class="pi pi-plus"></i>
+              Globale Regel erstellen
+            </button>
+          </div>
+        }
+
+        @if (globalRules().length > 0) {
+          <div class="ss-rules-grid ss-rules-grid--global">
+
+            @for (rule of globalRules(); track rule.id) {
+              <div class="ss-rule-card ss-rule-card--global" [class.ss-rule-card--inactive]="!rule.active">
+
+                <div class="ss-rule-top">
+                  <div class="ss-rule-cat"
+                       [style.background]="getCategoryMeta(rule.category).color + '22'"
+                       [style.color]="getCategoryMeta(rule.category).color"
+                       [style.border-color]="getCategoryMeta(rule.category).color + '44'">
                     <i class="pi {{ getCategoryMeta(rule.category).icon }}"></i>
                     {{ getCategoryMeta(rule.category).label }}
                   </div>
-                  <div class="rs-rule-card-actions">
-                    <button class="rs-icon-btn" (click)="openEditRule(rule)" title="Bearbeiten">
+                  <div class="ss-rule-actions">
+                    <button class="ss-icon-btn ss-icon-btn--sm"
+                            (click)="openEditRule(rule, $event)">
                       <i class="pi pi-pencil"></i>
                     </button>
-                    <button class="rs-icon-btn rs-icon-btn--delete" (click)="deleteRule(rule.id)" title="Löschen">
+                    <button class="ss-icon-btn ss-icon-btn--sm ss-icon-btn--delete"
+                            (click)="confirmDeleteRule(rule.id, $event)">
                       <i class="pi pi-trash"></i>
                     </button>
                   </div>
                 </div>
 
-                <h3 class="rs-rule-title">{{ rule.title }}</h3>
-                <p class="rs-rule-desc">{{ rule.description }}</p>
+                <div class="ss-global-badge">
+                  <i class="pi pi-globe"></i>
+                  Global
+                </div>
 
-                @if (rule.setups.length > 0) {
-                  <div class="rs-rule-setups">
-                    @for (sid of rule.setups; track sid) {
-                      @if (getSetupById(sid); as setup) {
-                        <span class="rs-setup-chip" [style.background]="setup.color + '22'" [style.color]="setup.color" [style.borderColor]="setup.color + '44'">
-                        <i class="pi pi-bookmark"></i>
-                          {{ setup.name }}
-                      </span>
-                      }
-                    }
-                  </div>
+                <h4 class="ss-rule-title">{{ rule.title }}</h4>
+                @if (rule.description) {
+                  <p class="ss-rule-desc">{{ rule.description }}</p>
                 }
 
-                <div class="rs-rule-footer">
-                  <span class="rs-rule-date">{{ rule.createdAt }}</span>
-                  <label class="rs-toggle" [title]="rule.active ? 'Regel deaktivieren' : 'Regel aktivieren'">
-                    <input type="checkbox" [checked]="rule.active" (change)="toggleRule(rule.id)" />
-                    <span class="rs-toggle-track">
-                    <span class="rs-toggle-thumb"></span>
-                  </span>
-                    <span class="rs-toggle-label">{{ rule.active ? 'Aktiv' : 'Inaktiv' }}</span>
+                <div class="ss-rule-footer">
+                  <label class="ss-toggle">
+                    <input type="checkbox" [checked]="rule.active"
+                           (change)="toggleRule(rule.id)" />
+                    <span class="ss-toggle-track">
+                      <span class="ss-toggle-thumb"></span>
+                    </span>
+                    <span class="ss-toggle-label">{{ rule.active ? 'Aktiv' : 'Inaktiv' }}</span>
                   </label>
                 </div>
+
               </div>
             }
+
+            <!-- Add rule tile -->
+            <button class="ss-rule-add-tile" (click)="openNewRule(null)">
+              <i class="pi pi-plus"></i>
+              <span>Globale Regel hinzufügen</span>
+            </button>
+
           </div>
         }
-      </div>
+
+      }
+
     }
-
-    <!-- ════════════════ SETUPS TAB ════════════════ -->
-    @if (activeTab() === 'setups') {
-      <div class="rs-content">
-        @if (setups().length === 0) {
-          <div class="rs-empty">
-            <i class="pi pi-bookmark rs-empty-icon"></i>
-            <p>Noch keine Setups erstellt.</p>
-            <button class="rs-btn-primary" (click)="openNewSetup()">Erstes Setup erstellen</button>
-          </div>
-        } @else {
-          <div class="rs-setups-grid">
-            @for (setup of setups(); track setup.id) {
-              <div class="rs-setup-card">
-                <div class="rs-setup-card-accent" [style.background]="setup.color"></div>
-                <div class="rs-setup-card-body">
-                  <div class="rs-setup-card-top">
-                    <div class="rs-setup-icon" [style.background]="setup.color + '22'" [style.border]="'1px solid ' + setup.color + '44'">
-                      <i class="pi pi-bookmark" [style.color]="setup.color"></i>
-                    </div>
-                    <div class="rs-rule-card-actions">
-                      <button class="rs-icon-btn" (click)="openEditSetup(setup)" title="Bearbeiten">
-                        <i class="pi pi-pencil"></i>
-                      </button>
-                      <button class="rs-icon-btn rs-icon-btn--delete" (click)="deleteSetup(setup.id)" title="Löschen">
-                        <i class="pi pi-trash"></i>
-                      </button>
-                    </div>
-                  </div>
-
-                  <h3 class="rs-setup-name">{{ setup.name }}</h3>
-                  <p class="rs-setup-desc">{{ setup.description }}</p>
-
-                  @if (setup.tags.length > 0) {
-                    <div class="rs-setup-tags">
-                      @for (tag of setup.tags; track tag) {
-                        <span class="rs-tag">{{ tag }}</span>
-                      }
-                    </div>
-                  }
-
-                  <!-- Rules using this setup -->
-                  <div class="rs-setup-rules-count">
-                    <i class="pi pi-list"></i>
-                    {{ rulerFilter() }} Regeln verknüpft
-                  </div>
-                </div>
-              </div>
-            }
-          </div>
-        }
-      </div>
-    }
-
   </div>
-
-  <!-- ════════════════ RULE MODAL ════════════════ -->
-  @if (showRuleModal()) {
-    <div class="rs-modal-backdrop" (click)="showRuleModal.set(false)">
-      <div class="rs-modal" (click)="$event.stopPropagation()">
-        <div class="rs-modal-header">
-          <h2>{{ editingRule() ? 'Regel bearbeiten' : 'Neue Regel' }}</h2>
-          <button class="rs-modal-close" (click)="showRuleModal.set(false)">
-            <i class="pi pi-times"></i>
-          </button>
-        </div>
-
-        <div class="rs-modal-body">
-          <!-- Title -->
-          <div class="rs-field">
-            <label class="rs-field-label">Titel *</label>
-            <input class="rs-input" type="text" placeholder="z.B. Mindestens 1:2 R:R" [ngModel]="ruleForm().title" (ngModelChange)="ruleUpdateTitle($event)" />
-          </div>
-
-          <!-- Description -->
-          <div class="rs-field">
-            <label class="rs-field-label">Beschreibung</label>
-            <textarea class="rs-input rs-textarea" placeholder="Genauere Beschreibung der Regel..." rows="3" [ngModel]="ruleForm().description" (ngModelChange)="ruleUpdateDesc($event)"></textarea>
-          </div>
-
-          <!-- Category -->
-          <div class="rs-field">
-            <label class="rs-field-label">Kategorie</label>
-            <div class="rs-cat-grid">
-              @for (cat of categories; track cat.value) {
-                <button class="rs-cat-btn" [class.rs-cat-btn--selected]="ruleForm().category === cat.value" [style.borderColor]="ruleForm().category === cat.value ? cat.color + '88' : ''" [style.background]="ruleForm().category === cat.value ? cat.color + '18' : ''" (click)="ruleUpdateCategory(cat.value)">
-                  <i class="pi {{ cat.icon }}" [style.color]="cat.color"></i>
-                  <span>{{ cat.label }}</span>
-                </button>
-              }
-            </div>
-          </div>
-
-          <!-- Setups -->
-          @if (setups().length > 0) {
-            <div class="rs-field">
-              <label class="rs-field-label">Verknüpfte Setups</label>
-              <div class="rs-setup-select-grid">
-                @for (setup of setups(); track setup.id) {
-                  <button class="rs-setup-select-btn" [class.rs-setup-select-btn--selected]="isSetupSelected(setup.id)" [style.borderColor]="isSetupSelected(setup.id) ? setup.color + '88' : ''" [style.background]="isSetupSelected(setup.id) ? setup.color + '18' : ''" (click)="toggleSetupInRule(setup.id)">
-                    <span class="rs-setup-select-dot" [style.background]="setup.color"></span>
-                    {{ setup.name }}
-                    @if (isSetupSelected(setup.id)) {
-                      <i class="pi pi-check" [style.color]="setup.color"></i>
-                    }
-                  </button>
-                }
-              </div>
-            </div>
-          }
-        </div>
-
-        <div class="rs-modal-footer">
-          <button class="rs-btn-ghost" (click)="showRuleModal.set(false)">Abbrechen</button>
-          <button class="rs-btn-primary" (click)="saveRule()">
-            <i class="pi pi-check"></i>
-            {{ editingRule() ? 'Speichern' : 'Erstellen' }}
-          </button>
-        </div>
-      </div>
-    </div>
-  }
-
-  <!-- ════════════════ SETUP MODAL ════════════════ -->
-  @if (showSetupModal()) {
-    <div class="rs-modal-backdrop" (click)="showSetupModal.set(false)">
-      <div class="rs-modal" (click)="$event.stopPropagation()">
-        <div class="rs-modal-header">
-          <h2>{{ editingSetup() ? 'Setup bearbeiten' : 'Neues Setup' }}</h2>
-          <button class="rs-modal-close" (click)="showSetupModal.set(false)">
-            <i class="pi pi-times"></i>
-          </button>
-        </div>
-
-        <div class="rs-modal-body">
-          <!-- Name -->
-          <div class="rs-field">
-            <label class="rs-field-label">Name *</label>
-            <input class="rs-input" type="text" placeholder="z.B. Liquiditätszone" [ngModel]="setupForm().name" (ngModelChange)="setupUpdateName($event)" />
-          </div>
-
-          <!-- Description -->
-          <div class="rs-field">
-            <label class="rs-field-label">Beschreibung</label>
-            <textarea class="rs-input rs-textarea" placeholder="Wann und wie verwendest du dieses Setup?" rows="3" [ngModel]="setupForm().description" (ngModelChange)="setupUpdateDesc($event)"></textarea>
-          </div>
-
-          <!-- Tags -->
-          <div class="rs-field">
-            <label class="rs-field-label">Tags <span class="rs-field-hint">(kommagetrennt)</span></label>
-            <input class="rs-input" type="text" placeholder="z.B. SMC, Institutional, H4" [ngModel]="setupForm().tags" (ngModelChange)="setupUpdateTags($event)" />
-          </div>
-
-          <!-- Color -->
-          <div class="rs-field">
-            <label class="rs-field-label">Farbe</label>
-            <div class="rs-color-grid">
-              @for (color of setupColors; track color) {
-                <button class="rs-color-btn" [style.background]="color" [class.rs-color-btn--selected]="setupForm().color === color" (click)="setupUpdateColor(color)">
-                  @if (setupForm().color === color) {
-                    <i class="pi pi-check" style="color:#fff; font-size:12px;"></i>
-                  }
-                </button>
-              }
-            </div>
-          </div>
-        </div>
-
-        <div class="rs-modal-footer">
-          <button class="rs-btn-ghost" (click)="showSetupModal.set(false)">Abbrechen</button>
-          <button class="rs-btn-primary" (click)="saveSetup()">
-            <i class="pi pi-check"></i>
-            {{ editingSetup() ? 'Speichern' : 'Erstellen' }}
-          </button>
-        </div>
-      </div>
-    </div>
-  }
 </div>
+
+
+<!-- ════════════════════════════════════════
+     MODAL — Setup
+════════════════════════════════════════ -->
+@if (modalMode() === 'setup') {
+  <div class="ss-backdrop" (click)="closeModal()">
+    <div class="ss-modal" (click)="$event.stopPropagation()">
+
+      <div class="ss-modal-header">
+        <div class="ss-modal-title">
+          <div class="ss-modal-icon">
+            <i class="pi pi-bookmark"></i>
+          </div>
+          <h2>{{ editingSetup() ? 'Setup bearbeiten' : 'Neues Setup' }}</h2>
+        </div>
+        <button class="ss-modal-close" (click)="closeModal()">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+
+      <div class="ss-modal-body">
+
+        <div class="ss-field">
+          <label class="ss-field-label">Name *</label>
+          <input class="ss-input" type="text" placeholder="z.B. Liquiditätszone"
+                 [ngModel]="setupForm().name"
+                 (ngModelChange)="updateSetupForm({ name: $event })" />
+        </div>
+
+        <div class="ss-field">
+          <label class="ss-field-label">Beschreibung</label>
+          <textarea class="ss-input ss-textarea" rows="3"
+                    placeholder="Wann und wie nutzt du dieses Setup?"
+                    [ngModel]="setupForm().description"
+                    (ngModelChange)="updateSetupForm({ description: $event })"></textarea>
+        </div>
+
+        <div class="ss-field">
+          <label class="ss-field-label">Tags <span class="ss-field-hint">(kommagetrennt)</span></label>
+          <input class="ss-input" type="text" placeholder="z.B. SMC, Liquidität, H4"
+                 [ngModel]="setupForm().tags"
+                 (ngModelChange)="updateSetupForm({ tags: $event })" />
+        </div>
+
+        <div class="ss-field">
+          <label class="ss-field-label">Farbe</label>
+          <div class="ss-color-grid">
+            @for (color of setupColors; track color) {
+              <button class="ss-color-btn"
+                      [style.background]="color"
+                      [class.ss-color-btn--selected]="setupForm().color === color"
+                      (click)="updateSetupForm({ color: color })">
+                @if (setupForm().color === color) {
+                  <i class="pi pi-check"></i>
+                }
+              </button>
+            }
+          </div>
+        </div>
+
+      </div>
+
+      <div class="ss-modal-footer">
+        <button class="ss-btn-ghost" (click)="closeModal()">Abbrechen</button>
+        <button class="ss-btn-primary" (click)="saveSetup()" [disabled]="saving() || !setupForm().name.trim()">
+          @if (saving()) { <span class="ss-spinner ss-spinner--sm"></span> }
+          @else { <i class="pi pi-check"></i> }
+          {{ editingSetup() ? 'Speichern' : 'Setup erstellen' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+}
+
+
+<!-- ════════════════════════════════════════
+     MODAL — Rule
+════════════════════════════════════════ -->
+@if (modalMode() === 'rule') {
+  <div class="ss-backdrop" (click)="closeModal()">
+    <div class="ss-modal" (click)="$event.stopPropagation()">
+
+      <div class="ss-modal-header">
+        <div class="ss-modal-title">
+          <div class="ss-modal-icon ss-modal-icon--rule">
+            <i class="pi pi-list"></i>
+          </div>
+          <h2>{{ getRuleModalTitle() }}</h2>
+        </div>
+        <button class="ss-modal-close" (click)="closeModal()">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+
+      <div class="ss-modal-body">
+
+        <div class="ss-field">
+          <label class="ss-field-label">Titel *</label>
+          <input class="ss-input" type="text" placeholder="z.B. Mindestens 1:2 R:R"
+                 [ngModel]="ruleForm().title"
+                 (ngModelChange)="updateRuleForm({ title: $event })" />
+        </div>
+
+        <div class="ss-field">
+          <label class="ss-field-label">Beschreibung</label>
+          <textarea class="ss-input ss-textarea" rows="3"
+                    placeholder="Genauere Beschreibung der Regel…"
+                    [ngModel]="ruleForm().description"
+                    (ngModelChange)="updateRuleForm({ description: $event })"></textarea>
+        </div>
+
+        <div class="ss-field">
+          <label class="ss-field-label">Kategorie</label>
+          <div class="ss-cat-grid">
+            @for (cat of categories; track cat.value) {
+              <button class="ss-cat-btn"
+                      [class.ss-cat-btn--selected]="ruleForm().category === cat.value"
+                      [style.border-color]="ruleForm().category === cat.value ? cat.color + '88' : ''"
+                      [style.background]="ruleForm().category === cat.value ? cat.color + '18' : ''"
+                      (click)="updateRuleForm({ category: cat.value })">
+                <i class="pi {{ cat.icon }}" [style.color]="cat.color"></i>
+                <span>{{ cat.label }}</span>
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Scope selector -->
+        <div class="ss-field">
+          <label class="ss-field-label">Zuordnung</label>
+          <div class="ss-scope-grid">
+            <button class="ss-scope-btn"
+                    [class.ss-scope-btn--selected]="ruleForm().setup_id === null"
+                    (click)="updateRuleForm({ setup_id: null })">
+              <i class="pi pi-globe"></i>
+              <div>
+                <span class="ss-scope-label">Global</span>
+                <span class="ss-scope-sub">Gilt für alle Setups</span>
+              </div>
+            </button>
+            @for (setup of setups(); track setup.id) {
+              <button class="ss-scope-btn"
+                      [class.ss-scope-btn--selected]="ruleForm().setup_id === setup.id"
+                      (click)="updateRuleForm({ setup_id: setup.id })">
+                <div class="ss-scope-dot" [style.background]="setup.color"></div>
+                <div>
+                  <span class="ss-scope-label">{{ setup.name }}</span>
+                  <span class="ss-scope-sub">Setup-spezifisch</span>
+                </div>
+              </button>
+            }
+          </div>
+        </div>
+
+      </div>
+
+      <div class="ss-modal-footer">
+        <button class="ss-btn-ghost" (click)="closeModal()">Abbrechen</button>
+        <button class="ss-btn-primary" (click)="saveRule()" [disabled]="saving() || !ruleForm().title.trim()">
+          @if (saving()) { <span class="ss-spinner ss-spinner--sm"></span> }
+          @else { <i class="pi pi-check"></i> }
+          {{ editingRule() ? 'Speichern' : 'Regel erstellen' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+}
+
+
+<!-- ════════════════════════════════════════
+     MODAL — Confirm Delete (Setup)
+════════════════════════════════════════ -->
+@if (modalMode() === 'deleteSetup') {
+  <div class="ss-backdrop" (click)="closeModal()">
+    <div class="ss-confirm" (click)="$event.stopPropagation()">
+      <div class="ss-confirm-icon ss-confirm-icon--danger">
+        <i class="pi pi-exclamation-triangle"></i>
+      </div>
+      <h3>Setup löschen?</h3>
+      <p>Das Setup und alle zugehörigen Regeln werden unwiderruflich gelöscht.</p>
+      <div class="ss-confirm-actions">
+        <button class="ss-btn-ghost" (click)="closeModal()">Abbrechen</button>
+        <button class="ss-btn-danger" (click)="deleteSetup()">
+          <i class="pi pi-trash"></i>
+          Löschen
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+
+<!-- ════════════════════════════════════════
+     MODAL — Confirm Delete (Rule)
+════════════════════════════════════════ -->
+@if (modalMode() === 'deleteRule') {
+  <div class="ss-backdrop" (click)="closeModal()">
+    <div class="ss-confirm" (click)="$event.stopPropagation()">
+      <div class="ss-confirm-icon ss-confirm-icon--danger">
+        <i class="pi pi-exclamation-triangle"></i>
+      </div>
+      <h3>Regel löschen?</h3>
+      <p>Diese Aktion kann nicht rückgängig gemacht werden.</p>
+      <div class="ss-confirm-actions">
+        <button class="ss-btn-ghost" (click)="closeModal()">Abbrechen</button>
+        <button class="ss-btn-danger" (click)="deleteRule()">
+          <i class="pi pi-trash"></i>
+          Löschen
+        </button>
+      </div>
+    </div>
+  </div>
+}
