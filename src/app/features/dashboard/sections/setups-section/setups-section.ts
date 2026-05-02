@@ -3,48 +3,44 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SectionHeader } from '../../components/section-header/section-header';
 import { supabase } from '../../../../core/supabase.client';
+import {SetupsService} from '../../../../core/services/setups-service/setups-service';
 
-async function getCurrentUserId(): Promise<string | null> {
-  const { data } = await supabase.auth.getUser();
-  return data.user?.id ?? null;
-}
-
-// ─── Domain Types ───────────────────────────────────────────────────────────
+// ─── Domain Types ────────────────────────────────────────────────────────────
 
 export interface Setup {
-  id: string;
-  user_id: string;
-  name: string;
+  id:          string;
+  user_id:     string;
+  name:        string;
   description: string;
-  tags: string[];
-  color: string;
-  created_at: string;
-  updated_at: string;
+  tags:        string[];
+  color:       string;
+  created_at:  string;
+  updated_at:  string;
 }
 
 export interface Rule {
-  id: string;
-  user_id: string;
-  setup_id: string | null; // null = global rule
-  title: string;
+  id:          string;
+  user_id:     string;
+  setup_id:    string | null;
+  title:       string;
   description: string;
-  category: 'entry' | 'exit' | 'risk' | 'mindset' | 'general';
-  active: boolean;
-  created_at: string;
-  updated_at: string;
+  category:    'entry' | 'exit' | 'risk' | 'mindset' | 'general';
+  active:      boolean;
+  created_at:  string;
+  updated_at:  string;
 }
 
 export type CategoryMeta = {
   value: Rule['category'];
   label: string;
-  icon: string;
+  icon:  string;
   color: string;
 };
 
 type ModalMode = 'none' | 'setup' | 'rule' | 'deleteSetup' | 'deleteRule';
 type MainTab   = 'setups' | 'global-rules';
 
-// ─── Component ──────────────────────────────────────────────────────────────
+// ─── Component ───────────────────────────────────────────────────────────────
 
 @Component({
   selector: 'app-setups-section',
@@ -55,33 +51,33 @@ type MainTab   = 'setups' | 'global-rules';
 })
 export class SetupsSection implements OnInit {
 
-  // ── Data ──────────────────────────────────────────────────────────────────
-  setups      = signal<Setup[]>([]);
-  rules       = signal<Rule[]>([]);
-  loading     = signal(true);
-  saving      = signal(false);
-  error       = signal('');
+  // ── Data ─────────────────────────────────────────────────────────────────
+  setups  = signal<Setup[]>([]);
+  rules   = signal<Rule[]>([]);
+  loading = signal(true);
+  saving  = signal(false);
+  error   = signal('');
 
-  // ── UI State ──────────────────────────────────────────────────────────────
+  // ── UI State ─────────────────────────────────────────────────────────────
   mainTab         = signal<MainTab>('setups');
   expandedSetupId = signal<string | null>(null);
   modalMode       = signal<ModalMode>('none');
   pendingDeleteId = signal<string>('');
 
-  // ── Form – Setup ──────────────────────────────────────────────────────────
+  // ── Form – Setup ─────────────────────────────────────────────────────────
   editingSetup = signal<Setup | null>(null);
   setupForm    = signal({ name: '', description: '', tags: '', color: '#7c3aed' });
 
-  // ── Form – Rule ───────────────────────────────────────────────────────────
-  editingRule  = signal<Rule | null>(null);
-  ruleForm     = signal({
+  // ── Form – Rule ──────────────────────────────────────────────────────────
+  editingRule = signal<Rule | null>(null);
+  ruleForm    = signal({
     title:       '',
     description: '',
     category:    'general' as Rule['category'],
-    setup_id:    null as string | null,   // null = global
+    setup_id:    null as string | null,
   });
 
-  // ── Static Config ─────────────────────────────────────────────────────────
+  // ── Static Config ────────────────────────────────────────────────────────
   readonly categories: CategoryMeta[] = [
     { value: 'entry',   label: 'Einstieg',  icon: 'pi-sign-in',  color: '#22c55e' },
     { value: 'exit',    label: 'Ausstieg',  icon: 'pi-sign-out', color: '#ef4444' },
@@ -91,18 +87,17 @@ export class SetupsSection implements OnInit {
   ];
 
   readonly setupColors = [
-    '#7c3aed','#22c55e','#ef4444','#f59e0b',
-    '#3b82f6','#ec4899','#14b8a6','#f97316',
+    '#7c3aed', '#22c55e', '#ef4444', '#f59e0b',
+    '#3b82f6', '#ec4899', '#14b8a6', '#f97316',
   ];
 
-  // ── Computed ──────────────────────────────────────────────────────────────
-  globalRules = computed(() => this.rules().filter(r => r.setup_id === null));
+  // ── Computed ─────────────────────────────────────────────────────────────
+  globalRules       = computed(() => this.rules().filter(r => r.setup_id === null));
+  activeGlobalCount = computed(() => this.globalRules().filter(r => r.active).length);
 
   rulesForSetup(setupId: string): Rule[] {
     return this.rules().filter(r => r.setup_id === setupId);
   }
-
-  activeGlobalCount = computed(() => this.globalRules().filter(r => r.active).length);
 
   getCategoryMeta(cat: Rule['category']): CategoryMeta {
     return this.categories.find(c => c.value === cat) ?? this.categories[4];
@@ -112,25 +107,24 @@ export class SetupsSection implements OnInit {
     return this.setups().find(s => s.id === id);
   }
 
-  // ── Lifecycle ─────────────────────────────────────────────────────────────
-  async ngOnInit() {
+  constructor(private setupsService: SetupsService) {}
+
+  // ── Lifecycle ────────────────────────────────────────────────────────────
+  async ngOnInit(): Promise<void> {
     await this.loadAll();
   }
 
-  private async loadAll() {
+  async loadAll(): Promise<void> {
     this.loading.set(true);
     this.error.set('');
 
-    const [{ data: setupData, error: se }, { data: ruleData, error: re }] = await Promise.all([
-      supabase.from('setups').select('*').order('created_at', { ascending: false }),
-      supabase.from('rules').select('*').order('created_at',  { ascending: false }),
-    ]);
+    const { setups, rules, error } = await this.setupsService.loadAll();
 
-    if (se || re) {
-      this.error.set('Fehler beim Laden der Daten: ' + (se?.message ?? re?.message));
+    if (error) {
+      this.error.set('Fehler beim Laden der Daten: ' + error);
     } else {
-      this.setups.set((setupData ?? []) as Setup[]);
-      this.rules.set((ruleData  ?? []) as Rule[]);
+      this.setups.set(setups);
+      this.rules.set(rules);
     }
 
     this.loading.set(false);
@@ -138,13 +132,13 @@ export class SetupsSection implements OnInit {
 
   // ── Setup CRUD ────────────────────────────────────────────────────────────
 
-  openNewSetup() {
+  openNewSetup(): void {
     this.editingSetup.set(null);
     this.setupForm.set({ name: '', description: '', tags: '', color: '#7c3aed' });
     this.modalMode.set('setup');
   }
 
-  openEditSetup(s: Setup, event: Event) {
+  openEditSetup(s: Setup, event: Event): void {
     event.stopPropagation();
     this.editingSetup.set(s);
     this.setupForm.set({
@@ -156,38 +150,43 @@ export class SetupsSection implements OnInit {
     this.modalMode.set('setup');
   }
 
-  async saveSetup() {
+  async saveSetup(): Promise<void> {
     const f = this.setupForm();
     if (!f.name.trim()) return;
 
     this.saving.set(true);
-    const tags  = f.tags.split(',').map(t => t.trim()).filter(Boolean);
+    const tags    = f.tags.split(',').map(t => t.trim()).filter(Boolean);
     const editing = this.editingSetup();
 
     if (editing) {
-      const { error } = await supabase
-        .from('setups')
-        .update({ name: f.name.trim(), description: f.description.trim(), tags, color: f.color })
-        .eq('id', editing.id);
+      const { error } = await this.setupsService.updateSetup(editing.id, {
+        name:        f.name.trim(),
+        description: f.description.trim(),
+        tags,
+        color:       f.color,
+      });
 
       if (!error) {
         this.setups.update(list =>
           list.map(s => s.id === editing.id
             ? { ...s, name: f.name.trim(), description: f.description.trim(), tags, color: f.color }
-            : s));
+            : s
+          )
+        );
       }
     } else {
-      const userId = await getCurrentUserId();
+      const userId = await this.getCurrentUserId();
       if (!userId) { this.saving.set(false); return; }
 
-      const { data, error } = await supabase
-        .from('setups')
-        .insert({ user_id: userId, name: f.name.trim(), description: f.description.trim(), tags, color: f.color })
-        .select()
-        .single();
+      const { data, error } = await this.setupsService.createSetup(userId, {
+        name:        f.name.trim(),
+        description: f.description.trim(),
+        tags,
+        color:       f.color,
+      });
 
       if (!error && data) {
-        this.setups.update(list => [data as Setup, ...list]);
+        this.setups.update(list => [data, ...list]);
       }
     }
 
@@ -195,37 +194,37 @@ export class SetupsSection implements OnInit {
     this.modalMode.set('none');
   }
 
-  confirmDeleteSetup(id: string, event: Event) {
+  confirmDeleteSetup(id: string, event: Event): void {
     event.stopPropagation();
     this.pendingDeleteId.set(id);
     this.modalMode.set('deleteSetup');
   }
 
-  async deleteSetup() {
+  async deleteSetup(): Promise<void> {
     const id = this.pendingDeleteId();
-    const { error } = await supabase.from('setups').delete().eq('id', id);
+    const { error } = await this.setupsService.deleteSetup(id);
+
     if (!error) {
       this.setups.update(list => list.filter(s => s.id !== id));
-      // Rules are cascade-deleted by DB; remove locally too
       this.rules.update(list => list.filter(r => r.setup_id !== id));
       if (this.expandedSetupId() === id) this.expandedSetupId.set(null);
     }
     this.modalMode.set('none');
   }
 
-  toggleSetupExpand(id: string) {
+  toggleSetupExpand(id: string): void {
     this.expandedSetupId.update(v => v === id ? null : id);
   }
 
   // ── Rule CRUD ─────────────────────────────────────────────────────────────
 
-  openNewRule(setupId: string | null = null) {
+  openNewRule(setupId: string | null = null): void {
     this.editingRule.set(null);
     this.ruleForm.set({ title: '', description: '', category: 'general', setup_id: setupId });
     this.modalMode.set('rule');
   }
 
-  openEditRule(r: Rule, event: Event) {
+  openEditRule(r: Rule, event: Event): void {
     event.stopPropagation();
     this.editingRule.set(r);
     this.ruleForm.set({
@@ -237,7 +236,7 @@ export class SetupsSection implements OnInit {
     this.modalMode.set('rule');
   }
 
-  async saveRule() {
+  async saveRule(): Promise<void> {
     const f = this.ruleForm();
     if (!f.title.trim()) return;
 
@@ -245,41 +244,34 @@ export class SetupsSection implements OnInit {
     const editing = this.editingRule();
 
     if (editing) {
-      const { error } = await supabase
-        .from('rules')
-        .update({
-          title:       f.title.trim(),
-          description: f.description.trim(),
-          category:    f.category,
-          setup_id:    f.setup_id,
-        })
-        .eq('id', editing.id);
+      const { error } = await this.setupsService.updateRule(editing.id, {
+        title:       f.title.trim(),
+        description: f.description.trim(),
+        category:    f.category,
+        setup_id:    f.setup_id,
+      });
 
       if (!error) {
         this.rules.update(list =>
           list.map(r => r.id === editing.id
             ? { ...r, title: f.title.trim(), description: f.description.trim(), category: f.category, setup_id: f.setup_id }
-            : r));
+            : r
+          )
+        );
       }
     } else {
-      const userId = await getCurrentUserId();
+      const userId = await this.getCurrentUserId();
       if (!userId) { this.saving.set(false); return; }
 
-      const { data, error } = await supabase
-        .from('rules')
-        .insert({
-          user_id:     userId,
-          title:       f.title.trim(),
-          description: f.description.trim(),
-          category:    f.category,
-          setup_id:    f.setup_id,
-          active:      true,
-        })
-        .select()
-        .single();
+      const { data, error } = await this.setupsService.createRule(userId, {
+        title:       f.title.trim(),
+        description: f.description.trim(),
+        category:    f.category,
+        setup_id:    f.setup_id,
+      });
 
       if (!error && data) {
-        this.rules.update(list => [data as Rule, ...list]);
+        this.rules.update(list => [data, ...list]);
       }
     }
 
@@ -287,54 +279,60 @@ export class SetupsSection implements OnInit {
     this.modalMode.set('none');
   }
 
-  confirmDeleteRule(id: string, event: Event) {
+  confirmDeleteRule(id: string, event: Event): void {
     event.stopPropagation();
     this.pendingDeleteId.set(id);
     this.modalMode.set('deleteRule');
   }
 
-  async deleteRule() {
+  async deleteRule(): Promise<void> {
     const id = this.pendingDeleteId();
-    const { error } = await supabase.from('rules').delete().eq('id', id);
+    const { error } = await this.setupsService.deleteRule(id);
+
     if (!error) {
       this.rules.update(list => list.filter(r => r.id !== id));
     }
     this.modalMode.set('none');
   }
 
-  async toggleRule(id: string) {
+  async toggleRule(id: string): Promise<void> {
     const rule = this.rules().find(r => r.id === id);
     if (!rule) return;
-    const newActive = !rule.active;
 
-    const { error } = await supabase
-      .from('rules')
-      .update({ active: newActive })
-      .eq('id', id);
+    const { error } = await this.setupsService.toggleRuleActive(id, rule.active);
 
     if (!error) {
       this.rules.update(list =>
-        list.map(r => r.id === id ? { ...r, active: newActive } : r));
+        list.map(r => r.id === id ? { ...r, active: !r.active } : r)
+      );
     }
   }
 
   // ── Form Helpers ──────────────────────────────────────────────────────────
-  closeModal() { this.modalMode.set('none'); }
 
-  updateSetupForm(patch: Partial<{ name: string; description: string; tags: string; color: string }>) {
+  closeModal(): void { this.modalMode.set('none'); }
+
+  updateSetupForm(patch: Partial<{ name: string; description: string; tags: string; color: string }>): void {
     this.setupForm.update(f => ({ ...f, ...patch }));
   }
 
-  updateRuleForm(patch: Partial<{ title: string; description: string; category: Rule['category']; setup_id: string | null }>) {
+  updateRuleForm(patch: Partial<{ title: string; description: string; category: Rule['category']; setup_id: string | null }>): void {
     this.ruleForm.update(f => ({ ...f, ...patch }));
   }
 
   getRuleModalTitle(): string {
     const isGlobal = this.ruleForm().setup_id === null;
     const isEdit   = !!this.editingRule();
-    if (isEdit)   return 'Regel bearbeiten';
-    if (isGlobal) return 'Globale Regel erstellen';
+    if (isEdit)    return 'Regel bearbeiten';
+    if (isGlobal)  return 'Globale Regel erstellen';
     const setup = this.getSetupById(this.ruleForm().setup_id!);
     return `Regel für „${setup?.name ?? '...'}" erstellen`;
+  }
+
+  // ── Private Helpers ───────────────────────────────────────────────────────
+
+  private async getCurrentUserId(): Promise<string | null> {
+    const { data } = await supabase.auth.getUser();
+    return data.user?.id ?? null;
   }
 }
