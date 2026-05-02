@@ -34,7 +34,7 @@ export class Dashboard {
   ];
 
   learnItems: NavItem[] = [
-    { icon: 'pi-chart-bar', label: 'Analyse', key: 'chart-bar' },
+    { icon: 'pi-trophy', label: 'Rangliste', key: 'chart-bar' },
   ];
 
   adminItems: NavItem[] = [
