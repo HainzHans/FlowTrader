@@ -1,10 +1,66 @@
-<app-section-header
-  [title]="'Willkommen zurück UserX001'"
-  [subTitle]="'Halte deine Performance im Auge'"
-  [primaryButtonIcon]="'pi-angle-down'"
-  [primaryButtonText]="'Konto auswählen'">
-</app-section-header>
-<div class="section-content">
+<div class="ds-root">
+
+  <!-- ── Page Header ── -->
+  <div class="ds-page-header">
+    <div class="ds-greeting">
+      <div class="ds-greeting-eyebrow">
+        <span class="ds-status-dot"></span>
+        <span class="ds-date">{{ todayFormatted }}</span>
+      </div>
+      <h1 class="ds-greeting-title">
+        {{ greeting() }}, <span class="ds-name">{{ displayName() }}</span>
+      </h1>
+      <p class="ds-greeting-sub">Hier ist ein Überblick über dein Trading.</p>
+    </div>
+  </div>
+
+  <!-- ── Loading ── -->
+  @if (loading()) {
+    <div class="ds-loading">
+      <div class="ds-spinner"></div>
+      <p>Dashboard wird geladen…</p>
+    </div>
+  }
+
+  <!-- ── Content ── -->
+  @if (!loading()) {
+
+    <!-- Stats Row -->
+    <app-dashboard-stats [stats]="stats()"></app-dashboard-stats>
+
+    <!-- Main Grid -->
+    <div class="ds-main-grid">
+
+      <!-- P&L Chart (wide) -->
+      <div class="ds-col-wide">
+        <app-dashboard-pnl-chart [trades]="trades()"></app-dashboard-pnl-chart>
+      </div>
+
+      <!-- Win Rate (narrow) -->
+      <div class="ds-col-narrow">
+        <app-dashboard-winrate [trades]="trades()"></app-dashboard-winrate>
+      </div>
+
+    </div>
+
+    <!-- Bottom Grid -->
+    <div class="ds-bottom-grid">
+
+      <!-- Recent Trades -->
+      <div class="ds-col-recent">
+        <app-dashboard-recent-trades [trades]="trades()"></app-dashboard-recent-trades>
+      </div>
+
+      <!-- Accounts Overview -->
+      <div class="ds-col-accounts">
+        <app-dashboard-account-overview [accounts]="accounts()"></app-dashboard-account-overview>
+      </div>
+
+    </div>
+
+    <!-- Calendar -->
+    <app-dashboard-calendar [trades]="trades()"></app-dashboard-calendar>
+
+  }
 
 </div>
-

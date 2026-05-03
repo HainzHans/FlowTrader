@@ -1,5 +1,147 @@
-.section-content {
+/* ═══════════════════════════════════════════
+   Dashboard Section — FlowTrader
+   Full-page dashboard layout
+═══════════════════════════════════════════ */
+
+.ds-root {
   display: flex;
   flex-direction: column;
-  padding: 1rem 0;
+  gap: var(--space-5);
+  padding-bottom: var(--space-12);
+  animation: dsIn 0.3s ease both;
+}
+
+@keyframes dsIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Page Header ── */
+.ds-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-6);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--border-subtle);
+  flex-wrap: wrap;
+}
+
+.ds-greeting-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: var(--space-2);
+}
+
+.ds-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green);
+  animation: dsPulse 2.5s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes dsPulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 8px var(--green); }
+  50%       { opacity: 0.6; box-shadow: 0 0 3px var(--green); }
+}
+
+.ds-date {
+  font-size: 12px;
+  font-family: var(--font-mono);
+  color: var(--text-tertiary);
+  letter-spacing: 0.02em;
+}
+
+.ds-greeting-title {
+  font-size: clamp(1.375rem, 2.5vw, 1.75rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.15;
+  color: var(--text-primary);
+  margin-bottom: var(--space-1);
+}
+
+.ds-name {
+  color: var(--accent-bright);
+}
+
+.ds-greeting-sub {
+  font-size: 13.5px;
+  color: var(--text-tertiary);
+}
+
+/* ── Loading ── */
+.ds-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-20) 0;
+  color: var(--text-tertiary);
+  font-size: 13.5px;
+  font-family: var(--font-mono);
+}
+
+.ds-spinner {
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--border-default);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: dsSpin 0.7s linear infinite;
+}
+
+@keyframes dsSpin { to { transform: rotate(360deg); } }
+
+/* ── Main Grid (P&L + WinRate) ── */
+.ds-main-grid {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: var(--space-5);
+  align-items: stretch;
+}
+
+/* ── Bottom Grid (Recent Trades + Accounts) ── */
+.ds-bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-5);
+  align-items: stretch;
+}
+
+/* ══════════════════════════════════════════
+   Responsive
+══════════════════════════════════════════ */
+@media (max-width: 1100px) {
+  .ds-main-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ds-col-narrow {
+    /* Win Rate goes full width on smaller screens, align content */
+  }
+
+  .ds-col-narrow app-dashboard-winrate {
+    /* Horizontal layout for win rate on medium screens */
+  }
+}
+
+@media (max-width: 860px) {
+  .ds-bottom-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .ds-root {
+    gap: var(--space-4);
+  }
+
+  .ds-greeting-title {
+    font-size: 1.25rem;
+  }
 }
